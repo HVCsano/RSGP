@@ -16,6 +16,7 @@
     "npm:prettier@^3.4.2": "3.6.1",
     "npm:svelte-check@4": "4.2.2_svelte@5.34.8__acorn@8.15.0_typescript@5.8.3",
     "npm:svelte@5": "5.34.8_acorn@8.15.0",
+    "npm:tailwind-variants@1": "1.0.0_tailwindcss@4.1.10",
     "npm:tailwindcss@4": "4.1.10",
     "npm:typescript-eslint@^8.20.0": "8.35.0_eslint@9.29.0_typescript@5.8.3_@typescript-eslint+parser@8.35.0__eslint@9.29.0__typescript@5.8.3",
     "npm:typescript@5": "5.8.3",
@@ -1537,6 +1538,16 @@
         "zimmerframe"
       ]
     },
+    "tailwind-merge@3.0.2": {
+      "integrity": "sha512-l7z+OYZ7mu3DTqrL88RiKrKIqO3NcpEO8V/Od04bNpvk0kiIFndGEoqfuzvj4yuhRkHKjRkII2z+KS2HfPcSxw=="
+    },
+    "tailwind-variants@1.0.0_tailwindcss@4.1.10": {
+      "integrity": "sha512-2WSbv4ulEEyuBKomOunut65D8UZwxrHoRfYnxGcQNnHqlSCp2+B7Yz2W+yrNDrxRodOXtGD/1oCcKGNBnUqMqA==",
+      "dependencies": [
+        "tailwind-merge",
+        "tailwindcss"
+      ]
+    },
     "tailwindcss@4.1.10": {
       "integrity": "sha512-P3nr6WkvKV/ONsTzj6Gb57sWPMX29EPNPopo7+FcpkQaNsrNpZ1pv8QmrYI2RqEKD7mlGqLnGovlcYnBK0IqUA=="
     },
@@ -1673,6 +1684,7 @@
         "npm:prettier@^3.4.2",
         "npm:svelte-check@4",
         "npm:svelte@5",
+        "npm:tailwind-variants@1",
         "npm:tailwindcss@4",
         "npm:typescript-eslint@^8.20.0",
         "npm:typescript@5",
