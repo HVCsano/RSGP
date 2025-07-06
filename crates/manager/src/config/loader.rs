@@ -1,12 +1,14 @@
 use std::path::Path;
 
 use base64::{Engine, engine::general_purpose};
-use rand::{Rng, TryRngCore, distr::StandardUniform, rngs::OsRng};
-use sha2::{Digest, Sha256};
-use tokio::fs;
+use rand::{TryRngCore, rngs::OsRng};
+use tokio::fs::{self, File};
 use tracing::{info, warn};
 
-use crate::config::structs::{Permissions, ServiceConfig, User, UsersConfig};
+use crate::{
+    config::structs::{Permissions, ServiceConfig, User, UsersConfig},
+    utils::hash::hash_str,
+};
 
 pub async fn load_configs() {
     let path = Path::new("./config");
@@ -16,12 +18,10 @@ pub async fn load_configs() {
     let users = Path::new("./config/users.json");
     if !users.exists() {
         warn!("No users.json found, creating default admin with password 'admin'");
-        let mut hasher = Sha256::new();
-        hasher.update("admin");
         let user = UsersConfig {
             users: vec![User {
                 username: "admin".to_string(),
-                password: format!("{:x}", hasher.finalize()),
+                password: hash_str("admin"),
                 permissions: vec![Permissions::Admin],
             }],
         };
@@ -47,4 +47,14 @@ pub async fn load_configs() {
             .unwrap();
         info!("Service config created.");
     }
+}
+
+pub async fn load_users() -> UsersConfig {
+    let users = File::open("./config/users.json").await.unwrap();
+    serde_json::from_reader(users.into_std().await).expect("Users config is invalid format.")
+}
+
+pub async fn load_service() -> ServiceConfig {
+    let service = File::open("./config/service.json").await.unwrap();
+    serde_json::from_reader(service.into_std().await).expect("Service config is invalid format.")
 }

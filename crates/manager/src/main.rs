@@ -10,6 +10,7 @@ use tracing_subscriber::FmtSubscriber;
 mod config;
 mod endpoints;
 mod jwt;
+mod utils;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -25,6 +26,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 "RSGP Manager API is running. Use the web interface to interact with it."
             }),
         )
+        .route("/auth/login", get(endpoints::login::login))
         .layer(ServiceBuilder::new().layer(CorsLayer::permissive()))
         .layer(TraceLayer::new_for_http())
         .layer(CookieManagerLayer::new());
