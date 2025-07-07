@@ -2,16 +2,18 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
 	// User icons
-
 	import HouseIcon from '@lucide/svelte/icons/house';
-	import UserIcon from '@lucide/svelte/icons/user';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
-	import ServerIcon from '@lucide/svelte/icons/server';
 
 	// Admin icons
 	import DashboardIcon from '@lucide/svelte/icons/layout-dashboard';
+	import ServerIcon from '@lucide/svelte/icons/server';
 	import UsersIcon from '@lucide/svelte/icons/users';
+	import GroupsIcon from '@lucide/svelte/icons/book-user';
 	import WorkersIcon from '@lucide/svelte/icons/pickaxe';
+	import EggIcon from '@lucide/svelte/icons/egg';
+
+	let props: { admin: boolean } = $props();
 </script>
 
 <Sidebar.Root>
@@ -28,18 +30,8 @@
 						<Sidebar.MenuButton>
 							{#snippet child({ props })}
 								<a href="/" {...props}>
-									<ServerIcon />
-									<span>Servers</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
-							{#snippet child({ props })}
-								<a href="/profile" {...props}>
-									<UserIcon />
-									<span>Profile</span>
+									<HouseIcon />
+									<span>Home</span>
 								</a>
 							{/snippet}
 						</Sidebar.MenuButton>
@@ -57,52 +49,84 @@
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
-		<Sidebar.Group>
-			<Sidebar.GroupLabel>Admin</Sidebar.GroupLabel>
-			<Sidebar.GroupContent>
-				<Sidebar.Menu>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
-							{#snippet child({ props })}
-								<a href="/admin" {...props}>
-									<DashboardIcon />
-									<span>Dashboard</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
-							{#snippet child({ props })}
-								<a href="/admin/users" {...props}>
-									<UsersIcon />
-									<span>Users</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
-							{#snippet child({ props })}
-								<a href="/admin/workers" {...props}>
-									<WorkersIcon />
-									<span>Workers</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton>
-							{#snippet child({ props })}
-								<a href="/admin/settings" {...props}>
-									<SettingsIcon />
-									<span>Site Settings</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-				</Sidebar.Menu>
-			</Sidebar.GroupContent>
-		</Sidebar.Group>
+		{#if props.admin}
+			<Sidebar.Group>
+				<Sidebar.GroupLabel>Admin</Sidebar.GroupLabel>
+				<Sidebar.GroupContent>
+					<Sidebar.Menu>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin" {...props}>
+										<DashboardIcon />
+										<span>Dashboard</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin/users" {...props}>
+										<UsersIcon />
+										<span>Users</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin/groups" {...props}>
+										<GroupsIcon />
+										<span>Groups</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin/servers" {...props}>
+										<ServerIcon />
+										<span>Servers</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin/workers" {...props}>
+										<WorkersIcon />
+										<span>Workers</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin/eggs" {...props}>
+										<EggIcon />
+										<span>Eggs</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/admin/settings" {...props}>
+										<SettingsIcon />
+										<span>Site Settings</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					</Sidebar.Menu>
+				</Sidebar.GroupContent>
+			</Sidebar.Group>
+		{/if}
 	</Sidebar.Content>
 </Sidebar.Root>

@@ -8,7 +8,7 @@
 
 	import { ModeWatcher } from 'mode-watcher';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <svelte:head>
@@ -26,13 +26,18 @@
 {#if page.url.pathname !== '/login'}
 	<header>
 		<Sidebar.Provider>
-			<OwnSidebar />
-			<main>
+			<OwnSidebar
+				admin={data.layout!.permissions.includes('AdminPage') ||
+					data.layout!.permissions.includes('Admin')}
+			/>
+			<main class="w-full">
 				<Sidebar.Trigger />
 				{@render children?.()}
 			</main>
 		</Sidebar.Provider>
 	</header>
+{:else}
+	{@render children?.()}
 {/if}
 
 <footer>

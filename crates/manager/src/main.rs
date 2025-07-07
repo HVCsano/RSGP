@@ -26,7 +26,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 "RSGP Manager API is running. Use the web interface to interact with it."
             }),
         )
-        .route("/auth/login", get(endpoints::login::login))
+        .route("/auth/login", get(endpoints::auth::login))
+        .nest("/user", endpoints::user::routes())
         .layer(ServiceBuilder::new().layer(CorsLayer::permissive()))
         .layer(TraceLayer::new_for_http())
         .layer(CookieManagerLayer::new());

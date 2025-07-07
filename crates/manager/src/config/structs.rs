@@ -9,14 +9,18 @@ pub enum PermissionsModifiers {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Permissions {
     Login,
+    User,
     AdminPage,
     Users(PermissionsModifiers),
     Groups(PermissionsModifiers),
+    Servers(PermissionsModifiers),
+    Workers(PermissionsModifiers),
+    Eggs(PermissionsModifiers),
     SiteSettings(PermissionsModifiers),
     Admin,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     pub username: String,
     pub password: String,
