@@ -1,5 +1,6 @@
 use axum::{
-    debug_handler, extract::Request, http::HeaderMap, middleware::Next, response::IntoResponse,
+    debug_handler, debug_middleware, extract::Request, http::HeaderMap, middleware::Next,
+    response::IntoResponse,
 };
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use reqwest::StatusCode;
@@ -7,12 +8,13 @@ use reqwest::StatusCode;
 use crate::{
     config::{
         loader::{load_service, load_users},
-        structs::User,
+        structs::{Permissions, User},
     },
     jwt::structs::JWT,
-    utils::hash::hash_str,
+    utils::{functions::atleast_one_permission, hash::hash_str},
 };
 
+#[debug_middleware]
 pub async fn auth_middle(
     h: HeaderMap,
     mut r: Request,
@@ -45,15 +47,7 @@ pub async fn auth_middle(
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "User not found".to_string()));
     }
-    if !user
-        .unwrap()
-        .permissions
-        .contains(&crate::config::structs::Permissions::Admin)
-        && !user
-            .unwrap()
-            .permissions
-            .contains(&crate::config::structs::Permissions::Login)
-    {
+    if !atleast_one_permission(vec![Permissions::Login], &user.unwrap().permissions) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
     r.extensions_mut().insert(User {
@@ -84,15 +78,7 @@ pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, Strin
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()));
     }
-    if !user
-        .unwrap()
-        .permissions
-        .contains(&crate::config::structs::Permissions::Admin)
-        && !user
-            .unwrap()
-            .permissions
-            .contains(&crate::config::structs::Permissions::Login)
-    {
+    if !atleast_one_permission(vec![Permissions::Login], &user.unwrap().permissions) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
     let service = load_service().await;

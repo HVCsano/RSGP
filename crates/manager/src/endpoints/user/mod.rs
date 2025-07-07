@@ -4,9 +4,12 @@ use axum::{
 
 use crate::{config::structs::User, endpoints::auth};
 
+mod admin;
+
 pub fn routes() -> Router {
     Router::new()
         .route("/", get(auth_home))
+        .nest("/admin", admin::routes())
         .layer(middleware::from_fn(auth::auth_middle))
 }
 

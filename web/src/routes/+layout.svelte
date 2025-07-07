@@ -32,7 +32,9 @@
 			/>
 			<main class="w-full">
 				<Sidebar.Trigger />
-				{@render children?.()}
+				<div class="w-full text-center">
+					{@render children?.()}
+				</div>
 			</main>
 		</Sidebar.Provider>
 	</header>
