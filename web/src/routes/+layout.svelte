@@ -1,5 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import '../app.css';
+
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+
+	import OwnSidebar from '$lib/ui/sidebar.svelte';
 
 	import { ModeWatcher } from 'mode-watcher';
 
@@ -18,10 +23,20 @@
 
 <ModeWatcher />
 
-{@render children()}
+{#if page.url.pathname !== '/login'}
+	<header>
+		<Sidebar.Provider>
+			<OwnSidebar />
+			<main>
+				<Sidebar.Trigger />
+				{@render children?.()}
+			</main>
+		</Sidebar.Provider>
+	</header>
+{/if}
 
 <footer>
-	<h1 class="absolute bottom-2 left-2">
+	<h1 class="absolute bottom-2 right-2">
 		Made by <a class="font-bold text-[#76ff7a]" target="_blank" href="https://csano.hu">HVCsano</a>,
 		with ❤️
 	</h1>

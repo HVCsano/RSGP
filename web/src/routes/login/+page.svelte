@@ -15,7 +15,7 @@
 	let { form } = $props();
 	if (form?.success && browser) {
 		setTimeout(() => {
-			goto('/dash', {
+			goto('/', {
 				replaceState: true
 			});
 		}, 300);

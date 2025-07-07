@@ -17,7 +17,6 @@ export const actions = {
                     password: password!.toString(),
                 },
             });
-            console.log(login.status);
             if (login.status === 200) {
                 const session = await login.text();
                 cookies.set("session", session, {
