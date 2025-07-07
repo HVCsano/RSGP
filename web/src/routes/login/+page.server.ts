@@ -6,9 +6,6 @@ export const load = (async () => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-    default: async () => {
-        return {};
-    },
     login: async ({ cookies, request }) => {
         const data = await request.formData();
         const username = data.get("username");
@@ -20,6 +17,7 @@ export const actions = {
                     password: password!.toString(),
                 },
             });
+            console.log(login.status);
             if (login.status === 200) {
                 const session = await login.text();
                 cookies.set("session", session, {
@@ -37,9 +35,9 @@ export const actions = {
                     error: "401",
                 };
             }
-        } catch {
+        } catch (e) {
             return {
-                error: "unknown",
+                error: `unknown/${e}`,
             };
         }
     },
