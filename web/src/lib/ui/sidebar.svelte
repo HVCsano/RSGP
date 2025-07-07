@@ -12,8 +12,9 @@
 	import GroupsIcon from '@lucide/svelte/icons/book-user';
 	import WorkersIcon from '@lucide/svelte/icons/pickaxe';
 	import EggIcon from '@lucide/svelte/icons/egg';
+	import { checkAdvancedPerms, type Permissions } from '$lib/api';
 
-	let props: { admin: boolean } = $props();
+	let props: { admin: boolean; permissions: Permissions[] } = $props();
 </script>
 
 <Sidebar.Root>
@@ -64,66 +65,78 @@
 								{/snippet}
 							</Sidebar.MenuButton>
 						</Sidebar.MenuItem>
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href="/admin/users" {...props}>
-										<UsersIcon />
-										<span>Users</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href="/admin/groups" {...props}>
-										<GroupsIcon />
-										<span>Groups</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href="/admin/servers" {...props}>
-										<ServerIcon />
-										<span>Servers</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href="/admin/workers" {...props}>
-										<WorkersIcon />
-										<span>Workers</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href="/admin/eggs" {...props}>
-										<EggIcon />
-										<span>Eggs</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href="/admin/settings" {...props}>
-										<SettingsIcon />
-										<span>Site Settings</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
+						{#if checkAdvancedPerms(props.permissions, 'Users', ['Write', 'Read'])}
+							<Sidebar.MenuItem>
+								<Sidebar.MenuButton>
+									{#snippet child({ props })}
+										<a href="/admin/users" {...props}>
+											<UsersIcon />
+											<span>Users</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/if}
+						{#if checkAdvancedPerms(props.permissions, 'Groups', ['Write', 'Read'])}
+							<Sidebar.MenuItem>
+								<Sidebar.MenuButton>
+									{#snippet child({ props })}
+										<a href="/admin/groups" {...props}>
+											<GroupsIcon />
+											<span>Groups</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/if}
+						{#if checkAdvancedPerms(props.permissions, 'Servers', ['Read', 'Write'])}
+							<Sidebar.MenuItem>
+								<Sidebar.MenuButton>
+									{#snippet child({ props })}
+										<a href="/admin/servers" {...props}>
+											<ServerIcon />
+											<span>Servers</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/if}
+						{#if checkAdvancedPerms(props.permissions, 'Workers', ['Read', 'Write'])}
+							<Sidebar.MenuItem>
+								<Sidebar.MenuButton>
+									{#snippet child({ props })}
+										<a href="/admin/workers" {...props}>
+											<WorkersIcon />
+											<span>Workers</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/if}
+						{#if checkAdvancedPerms(props.permissions, 'Eggs', ['Read', 'Write'])}
+							<Sidebar.MenuItem>
+								<Sidebar.MenuButton>
+									{#snippet child({ props })}
+										<a href="/admin/eggs" {...props}>
+											<EggIcon />
+											<span>Eggs</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/if}
+						{#if checkAdvancedPerms(props.permissions, 'SiteSettings', ['Read', 'Write'])}
+							<Sidebar.MenuItem>
+								<Sidebar.MenuButton>
+									{#snippet child({ props })}
+										<a href="/admin/settings" {...props}>
+											<SettingsIcon />
+											<span>Site Settings</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/if}
 					</Sidebar.Menu>
 				</Sidebar.GroupContent>
 			</Sidebar.Group>

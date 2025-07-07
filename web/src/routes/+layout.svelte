@@ -27,6 +27,7 @@
 	<header>
 		<Sidebar.Provider>
 			<OwnSidebar
+				permissions={data.layout!.permissions}
 				admin={data.layout!.permissions.includes('AdminPage') ||
 					data.layout!.permissions.includes('Admin')}
 			/>

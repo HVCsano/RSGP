@@ -9,8 +9,8 @@ pub enum PermissionsModifiers {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum Permissions {
     Login,
-    User,
     AdminPage,
+    User(PermissionsModifiers),
     Users(PermissionsModifiers),
     Groups(PermissionsModifiers),
     Servers(PermissionsModifiers),

@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from "./$types";
-import { apiUrl } from "$lib/api";
+import { apiUrl, type Permissions } from "$lib/api";
 
 export const load = (async ({ cookies, url }) => {
     if (url.pathname !== "/login") {
@@ -12,8 +12,10 @@ export const load = (async ({ cookies, url }) => {
             headers: { "Authorization": `Bearer ${ses}` },
         });
         if (checkLogin.status === 200) {
-            const json: { username: string; permissions: string[] } =
-                await checkLogin.json();
+            const json: {
+                username: string;
+                permissions: Permissions[];
+            } = await checkLogin.json();
             return {
                 layout: json,
             };

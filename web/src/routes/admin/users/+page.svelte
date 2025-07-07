@@ -6,6 +6,7 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
+	import { checkAdvancedPerms } from '$lib/api';
 </script>
 
 <svelte:head>
@@ -14,7 +15,9 @@
 
 <div class="flex items-center justify-center gap-4">
 	<h1 class="text-3xl font-bold">Users:</h1>
-	<Button><PlusIcon /></Button>
+	<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+		><PlusIcon /></Button
+	>
 </div>
 
 <div class="mx-2 flex flex-wrap gap-2">
@@ -35,8 +38,12 @@
 			</Card.Content>
 			<Card.Footer>
 				<div class="flex flex-col gap-2">
-					<Button>Change password</Button>
-					<Button>Change permissions</Button>
+					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+						>Change password</Button
+					>
+					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+						>Change permissions</Button
+					>
 				</div>
 			</Card.Footer>
 		</Card.Root>
