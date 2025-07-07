@@ -45,6 +45,17 @@ pub async fn auth_middle(
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "User not found".to_string()));
     }
+    if !user
+        .unwrap()
+        .permissions
+        .contains(&crate::config::structs::Permissions::Admin)
+        && !user
+            .unwrap()
+            .permissions
+            .contains(&crate::config::structs::Permissions::Login)
+    {
+        return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
+    }
     r.extensions_mut().insert(User {
         username: user.unwrap().username.clone(),
         password: user.unwrap().password.clone(),
@@ -72,6 +83,17 @@ pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, Strin
         .find(|us| us.username == u && us.password == hash_str(p));
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()));
+    }
+    if !user
+        .unwrap()
+        .permissions
+        .contains(&crate::config::structs::Permissions::Admin)
+        && !user
+            .unwrap()
+            .permissions
+            .contains(&crate::config::structs::Permissions::Login)
+    {
+        return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
     let service = load_service().await;
     let jwt = JWT {

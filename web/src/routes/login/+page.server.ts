@@ -34,6 +34,11 @@ export const actions = {
                     error: "401",
                 };
             }
+            if (login.status === 406) {
+                return {
+                    error: "406",
+                };
+            }
         } catch (e) {
             return {
                 error: `unknown/${e}`,

@@ -44,7 +44,10 @@
 					<Alert.Description>Error: {form.error.split('unknown/')[1]}</Alert.Description>
 				{/if}
 				{#if form.error === '401'}
-					<Alert.Description>Invalid credentials</Alert.Description>
+					<Alert.Description>Invalid credentials.</Alert.Description>
+				{/if}
+				{#if form.error === '406'}
+					<Alert.Description>Account is disabled.</Alert.Description>
 				{/if}
 			</Alert.Root>
 		</div>
