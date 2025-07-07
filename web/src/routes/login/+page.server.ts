@@ -10,11 +10,13 @@ export const actions = {
         const data = await request.formData();
         const username = data.get("username");
         const password = data.get("password");
+        const agent = data.get("agent");
         try {
             const login = await fetch(`${apiUrl}/auth/login`, {
                 headers: {
                     username: username!.toString(),
                     password: password!.toString(),
+                    agent: agent!.toString(),
                 },
             });
             if (login.status === 200) {

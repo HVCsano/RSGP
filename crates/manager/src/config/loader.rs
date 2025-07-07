@@ -6,7 +6,7 @@ use tokio::fs::{self, File};
 use tracing::{info, warn};
 
 use crate::{
-    config::structs::{Permissions, ServiceConfig, User, UsersConfig},
+    config::structs::{Permissions, ServiceConfig, Session, SessionsConfig, User, UsersConfig},
     utils::hash::hash_str,
 };
 
@@ -47,6 +47,17 @@ pub async fn load_configs() {
             .unwrap();
         info!("Service config created.");
     }
+    let sessions = Path::new("./config/sessions.json");
+    if !sessions.exists() {
+        warn!("No sessions.json found, creating empty one.");
+        fs::write(
+            sessions,
+            serde_json::to_string_pretty(&SessionsConfig::new()).unwrap(),
+        )
+        .await
+        .unwrap();
+        info!("sessions.json created.")
+    };
 }
 
 pub async fn load_users() -> UsersConfig {
@@ -57,4 +68,34 @@ pub async fn load_users() -> UsersConfig {
 pub async fn load_service() -> ServiceConfig {
     let service = File::open("./config/service.json").await.unwrap();
     serde_json::from_reader(service.into_std().await).expect("Service config is invalid format.")
+}
+
+pub async fn load_sessions() -> SessionsConfig {
+    let sessions = File::open("./config/sessions.json").await.unwrap();
+    serde_json::from_reader(sessions.into_std().await)
+        .expect("Sessions config is in invalid format.")
+}
+
+pub async fn add_session(id: String, name: String, agent: String, exp: i64) {
+    let mut sessions = load_sessions().await;
+    sessions.insert(
+        id,
+        Session {
+            agent,
+            username: name,
+            login: chrono::Utc::now().timestamp(),
+            exp,
+        },
+    );
+    fs::write(
+        "./config/sessions.json",
+        serde_json::to_string_pretty(&sessions).unwrap(),
+    )
+    .await
+    .unwrap();
+}
+
+pub async fn get_session(id: String) -> Option<Session> {
+    let sessions = load_sessions().await;
+    sessions.get(&id).cloned()
 }

@@ -20,6 +20,7 @@
 			});
 		}, 300);
 	}
+	let agent = $state(browser ? window.navigator.userAgent : 'server');
 </script>
 
 <svelte:head>
@@ -88,6 +89,7 @@
 							</Tooltip.Provider>
 						</div>
 						<Input name="password" type="password" required />
+						<input class="hidden" name="agent" type="text" bind:value={agent} />
 					</div>
 				</div>
 			</Card.Content>

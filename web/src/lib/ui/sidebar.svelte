@@ -4,6 +4,7 @@
 	// User icons
 	import HouseIcon from '@lucide/svelte/icons/house';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import LogoutIcon from '@lucide/svelte/icons/log-out';
 
 	// Admin icons
 	import DashboardIcon from '@lucide/svelte/icons/layout-dashboard';
@@ -43,6 +44,16 @@
 								<a href="/settings" {...props}>
 									<SettingsIcon />
 									<span>Settings</span>
+								</a>
+							{/snippet}
+						</Sidebar.MenuButton>
+					</Sidebar.MenuItem>
+					<Sidebar.MenuItem>
+						<Sidebar.MenuButton>
+							{#snippet child({ props })}
+								<a href="/logout" {...props}>
+									<LogoutIcon />
+									<span>Logout</span>
 								</a>
 							{/snippet}
 						</Sidebar.MenuButton>

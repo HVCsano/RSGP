@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -44,4 +46,14 @@ pub struct Workers {
     pub name: String,
     pub access: String,
     pub key: String,
+}
+
+pub type SessionsConfig = HashMap<String, Session>;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Session {
+    pub username: String,
+    pub agent: String,
+    pub login: i64,
+    pub exp: i64,
 }

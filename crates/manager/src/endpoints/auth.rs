@@ -4,10 +4,11 @@ use axum::{
 };
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use reqwest::StatusCode;
+use tracing::warn;
 
 use crate::{
     config::{
-        loader::{load_service, load_users},
+        loader::{add_session, get_session, load_service, load_users},
         structs::{Permissions, User},
     },
     jwt::structs::JWT,
@@ -36,14 +37,17 @@ pub async fn auth_middle(
         &Validation::default(),
     );
     if decode.is_err() {
+        warn!("Error: {}", decode.unwrap_err());
         return Err((StatusCode::UNAUTHORIZED, "Invalid JWT".to_string()));
     }
     let jwt_data: JWT = decode.unwrap().claims;
     let users = load_users().await;
-    let user = users
-        .users
-        .iter()
-        .find(|u| u.username == jwt_data.username && u.password == jwt_data.password);
+    let session = get_session(jwt_data.session_id.clone()).await;
+    if session.is_none() {
+        return Err((StatusCode::UNAUTHORIZED, "Invalid session".to_string()));
+    }
+    let session = session.unwrap();
+    let user = users.users.iter().find(|u| u.username == session.username);
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "User not found".to_string()));
     }
@@ -62,7 +66,8 @@ pub async fn auth_middle(
 pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, String)> {
     let u = h.get("username");
     let p = h.get("password");
-    if u.is_none() || p.is_none() {
+    let a = h.get("agent");
+    if u.is_none() || p.is_none() || a.is_none() {
         return Err((
             StatusCode::UNAUTHORIZED,
             "Missing login credentials".to_string(),
@@ -70,6 +75,7 @@ pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, Strin
     }
     let u = u.unwrap().to_str().unwrap();
     let p = p.unwrap().to_str().unwrap();
+    let a = a.unwrap().to_str().unwrap();
     let users = load_users().await;
     let user = users
         .users
@@ -82,10 +88,15 @@ pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, Strin
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
     let service = load_service().await;
+    let sess_id = uuid::Uuid::new_v4().to_string();
+    let exp = chrono::Utc::now()
+        .checked_add_signed(chrono::Duration::weeks(51))
+        .unwrap()
+        .timestamp();
+    add_session(sess_id.clone(), u.to_string(), a.to_string(), exp).await;
     let jwt = JWT {
-        username: u.to_string(),
-        password: hash_str(p),
-        exp: (chrono::Utc::now() + chrono::Duration::hours(6)).timestamp(),
+        session_id: sess_id,
+        exp,
     };
     let jwt_encoded = jsonwebtoken::encode(
         &Header::default(),
