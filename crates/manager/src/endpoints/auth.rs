@@ -47,19 +47,19 @@ pub async fn auth_middle(
         return Err((StatusCode::UNAUTHORIZED, "Invalid session".to_string()));
     }
     let session = session.unwrap();
-    let user = users.users.iter().find(|u| u.username == session.username);
+    let user = users.iter().find(|u| u.0.to_owned() == session.username);
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "User not found".to_string()));
     }
     let user = user.unwrap();
-    let perms = get_groups_perm(user.groups.clone()).await;
+    let perms = get_groups_perm(user.1.groups.clone()).await;
     if !atleast_one_permission(vec![Permissions::Login], &perms) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
     r.extensions_mut().insert(UserExt {
-        username: user.username.clone(),
-        password: user.password.clone(),
-        groups: user.groups.clone(),
+        username: user.0.clone(),
+        password: user.1.password.clone(),
+        groups: user.1.groups.clone(),
         permissions: perms,
     });
     Ok(n.run(r).await)
@@ -81,14 +81,13 @@ pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, Strin
     let a = a.unwrap().to_str().unwrap();
     let users = load_users().await;
     let user = users
-        .users
         .iter()
-        .find(|us| us.username == u && us.password == hash_str(p));
+        .find(|us| us.0 == u && us.1.password == hash_str(p));
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()));
     }
     let user = user.unwrap();
-    let perms = get_groups_perm(user.clone().groups).await;
+    let perms = get_groups_perm(user.1.clone().groups).await;
     if !atleast_one_permission(vec![Permissions::Login], &perms) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }

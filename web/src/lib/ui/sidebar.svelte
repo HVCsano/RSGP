@@ -20,7 +20,13 @@
 
 <Sidebar.Root>
 	<Sidebar.Header class="items-center justify-center">
-		<img src="/favicon.png" width="48px" alt="" class="pointer-events-none select-none" />
+		<img
+			src="/favicon.png"
+			width="48px"
+			height="48px"
+			alt=""
+			class="pointer-events-none select-none"
+		/>
 		<h1 class="textcenter font-bold">Rust Game Panel</h1>
 	</Sidebar.Header>
 	<Sidebar.Content>

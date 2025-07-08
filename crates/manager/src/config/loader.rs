@@ -2,7 +2,10 @@ use std::{collections::HashMap, path::Path};
 
 use base64::{Engine, engine::general_purpose};
 use rand::{TryRngCore, rngs::OsRng};
-use tokio::fs::{self, File};
+use tokio::{
+    fs::{self, File},
+    io::AsyncWriteExt,
+};
 use tracing::{info, warn};
 
 use crate::{
@@ -30,13 +33,14 @@ pub async fn load_configs() {
     let users = Path::new("./config/users.json");
     if !users.exists() {
         warn!("No users.json found, creating default admin with password 'admin'");
-        let user = UsersConfig {
-            users: vec![User {
-                username: "admin".to_string(),
+        let mut user: UsersConfig = HashMap::new();
+        user.insert(
+            "admin".to_string(),
+            User {
                 password: hash_str("admin"),
                 groups: vec!["admin".to_string()],
-            }],
-        };
+            },
+        );
         fs::write(users, serde_json::to_string_pretty(&user).unwrap())
             .await
             .unwrap();
@@ -77,6 +81,19 @@ pub async fn load_users() -> UsersConfig {
     serde_json::from_reader(users.into_std().await).expect("Users config is invalid format.")
 }
 
+pub async fn write_users(conf: UsersConfig) {
+    let mut users = File::options()
+        .write(true)
+        .truncate(true)
+        .open("./config/users.json")
+        .await
+        .unwrap();
+    users
+        .write_all(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
+        .await
+        .unwrap();
+}
+
 pub async fn load_groups() -> GroupsConfig {
     let groups = File::open("./config/groups.json").await.unwrap();
     serde_json::from_reader(groups.into_std().await).expect("Groups config is invalid format.")
@@ -105,6 +122,19 @@ pub async fn load_sessions() -> SessionsConfig {
     let sessions = File::open("./config/sessions.json").await.unwrap();
     serde_json::from_reader(sessions.into_std().await)
         .expect("Sessions config is in invalid format.")
+}
+
+pub async fn write_sessions(conf: SessionsConfig) {
+    let mut sessions = File::options()
+        .write(true)
+        .truncate(true)
+        .open("./config/sessions.json")
+        .await
+        .unwrap();
+    sessions
+        .write(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
+        .await
+        .unwrap();
 }
 
 pub async fn add_session(id: String, name: String, agent: String, exp: i64) {

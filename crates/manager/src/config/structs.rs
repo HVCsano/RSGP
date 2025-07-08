@@ -24,7 +24,6 @@ pub enum Permissions {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct User {
-    pub username: String,
     pub password: String,
     pub groups: Vec<String>,
 }
@@ -37,10 +36,7 @@ pub struct UserExt {
     pub permissions: Vec<Permissions>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UsersConfig {
-    pub users: Vec<User>,
-}
+pub type UsersConfig = HashMap<String, User>;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServiceConfig {
