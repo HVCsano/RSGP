@@ -27,13 +27,9 @@
 				<Card.Title>{user.username}</Card.Title>
 			</Card.Header>
 			<Card.Content>
-				<h1 class="text-lg font-bold">Permissions:</h1>
-				{#each user.permissions as perm}
-					{#if typeof perm === 'string'}
-						<p>{perm}</p>
-					{:else}
-						<p>{Object.keys(perm)[0]}: {perm[Object.keys(perm)[0]]}</p>
-					{/if}
+				<h1 class="text-lg font-bold">Groups:</h1>
+				{#each user.groups as g}
+					<p>{g}</p>
 				{/each}
 			</Card.Content>
 			<Card.Footer>

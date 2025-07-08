@@ -10,7 +10,7 @@ export const load = (async ({ cookies }) => {
         const users: {
             username: string;
             password: string;
-            permissions: string[];
+            groups: string[];
         }[] = await getusers.json();
         return { users };
     }

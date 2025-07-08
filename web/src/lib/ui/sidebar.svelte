@@ -51,7 +51,7 @@
 					<Sidebar.MenuItem>
 						<Sidebar.MenuButton>
 							{#snippet child({ props })}
-								<a href="/logout" {...props}>
+								<a href="/logout" {...props} data-sveltekit-reload>
 									<LogoutIcon />
 									<span>Logout</span>
 								</a>

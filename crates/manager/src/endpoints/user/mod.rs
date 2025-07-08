@@ -2,7 +2,7 @@ use axum::{
     Extension, Json, Router, debug_handler, middleware, response::IntoResponse, routing::get,
 };
 
-use crate::{config::structs::User, endpoints::auth};
+use crate::{config::structs::UserExt, endpoints::auth};
 
 mod admin;
 
@@ -14,6 +14,6 @@ pub fn routes() -> Router {
 }
 
 #[debug_handler]
-pub async fn auth_home(ext: Extension<User>) -> impl IntoResponse {
+pub async fn auth_home(ext: Extension<UserExt>) -> impl IntoResponse {
     Json(ext.0)
 }
