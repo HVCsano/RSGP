@@ -34,7 +34,7 @@ pub async fn load_configs() {
             users: vec![User {
                 username: "admin".to_string(),
                 password: hash_str("admin"),
-                groups: vec!["Admin".to_string()],
+                groups: vec!["admin".to_string()],
             }],
         };
         fs::write(users, serde_json::to_string_pretty(&user).unwrap())
