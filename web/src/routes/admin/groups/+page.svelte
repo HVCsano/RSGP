@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>RSGP - Users</title>
+	<title>RSGP - Groups</title>
 </svelte:head>
 
 <div class="flex items-center justify-center gap-4">
