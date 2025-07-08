@@ -14,36 +14,33 @@
 </svelte:head>
 
 <div class="flex items-center justify-center gap-4">
-	<h1 class="text-3xl font-bold">Users:</h1>
-	<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+	<h1 class="text-3xl font-bold">Groups:</h1>
+	<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Groups', ['Write'])}
 		><PlusIcon /></Button
 	>
 </div>
 
 <div class="mx-2 flex flex-wrap gap-2">
-	{#each data.users as user}
+	{#each Object.keys(data.groups) as gr}
 		<Card.Root>
 			<Card.Header>
-				<Card.Title>{user.username}</Card.Title>
+				<Card.Title>{gr}</Card.Title>
 			</Card.Header>
 			<Card.Content>
-				<h1 class="text-lg font-bold">Groups:</h1>
-				{#each user.groups as g}
+				<h1 class="text-lg font-bold">Permissions:</h1>
+				{#each data.groups[gr] as g}
 					<p>{g}</p>
 				{/each}
 			</Card.Content>
 			<Card.Footer>
 				<div class="flex flex-col gap-2">
-					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
-						>Change password</Button
-					>
-					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Groups', ['Write'])}
 						>Change permissions</Button
 					>
 					<Button
 						variant="destructive"
-						disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
-						>Delete user</Button
+						disabled={!checkAdvancedPerms(data.layout!.permissions, 'Groups', ['Write'])}
+						>Delete group</Button
 					>
 				</div>
 			</Card.Footer>

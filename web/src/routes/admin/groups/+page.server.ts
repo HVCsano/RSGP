@@ -3,16 +3,12 @@ import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load = (async ({ cookies }) => {
-    const getusers = await fetch(`${apiUrl}/user/admin/users/get`, {
+    const getgroups = await fetch(`${apiUrl}/user/admin/groups/get`, {
         headers: { "Authorization": `Bearer ${cookies.get("session")}` },
     });
-    if (getusers.ok) {
-        const users: {
-            username: string;
-            password: string;
-            groups: string[];
-        }[] = await getusers.json();
-        return { users };
+    if (getgroups.ok) {
+        const groups: { [key: string]: string[] } = await getgroups.json();
+        return { groups };
     }
     throw redirect(302, "/admin");
 }) satisfies PageServerLoad;
