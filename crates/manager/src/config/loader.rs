@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 
 use base64::{Engine, engine::general_purpose};
 use rand::{TryRngCore, rngs::OsRng};
@@ -6,7 +6,9 @@ use tokio::fs::{self, File};
 use tracing::{info, warn};
 
 use crate::{
-    config::structs::{Permissions, ServiceConfig, Session, SessionsConfig, User, UsersConfig},
+    config::structs::{
+        GroupsConfig, Permissions, ServiceConfig, Session, SessionsConfig, User, UsersConfig,
+    },
     utils::hash::hash_str,
 };
 
@@ -15,6 +17,16 @@ pub async fn load_configs() {
     if !path.exists() {
         fs::create_dir(path).await.unwrap();
     }
+    let groups = Path::new("./config/groups.json");
+    if !groups.exists() {
+        warn!("No groups.json found, creating default group 'admin'");
+        let mut groupsc: HashMap<String, Vec<Permissions>> = HashMap::new();
+        groupsc.insert("admin".to_string(), vec![Permissions::Admin]);
+        fs::write(groups, serde_json::to_string_pretty(&groupsc).unwrap())
+            .await
+            .unwrap();
+        info!("Default admin group created.")
+    }
     let users = Path::new("./config/users.json");
     if !users.exists() {
         warn!("No users.json found, creating default admin with password 'admin'");
@@ -22,13 +34,13 @@ pub async fn load_configs() {
             users: vec![User {
                 username: "admin".to_string(),
                 password: hash_str("admin"),
-                permissions: vec![Permissions::Admin],
+                groups: vec!["Admin".to_string()],
             }],
         };
         fs::write(users, serde_json::to_string_pretty(&user).unwrap())
             .await
             .unwrap();
-        info!("Default admin created.");
+        info!("Default admin user created.");
     }
     let service = Path::new("./config/service.json");
     if !service.exists() {
@@ -63,6 +75,25 @@ pub async fn load_configs() {
 pub async fn load_users() -> UsersConfig {
     let users = File::open("./config/users.json").await.unwrap();
     serde_json::from_reader(users.into_std().await).expect("Users config is invalid format.")
+}
+
+pub async fn load_groups() -> GroupsConfig {
+    let groups = File::open("./config/groups.json").await.unwrap();
+    serde_json::from_reader(groups.into_std().await).expect("Groups config is invalid format.")
+}
+
+pub async fn get_groups_perm(groups: Vec<String>) -> Vec<Permissions> {
+    let groupc = load_groups().await;
+    let mut perms = Vec::new();
+    for i in groups.iter() {
+        let group = groupc.get(i);
+        if group.is_some() {
+            for j in group.cloned().unwrap().iter() {
+                perms.push(j.clone());
+            }
+        }
+    }
+    perms
 }
 
 pub async fn load_service() -> ServiceConfig {

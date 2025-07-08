@@ -4,7 +4,7 @@ use reqwest::StatusCode;
 use crate::{
     config::{
         loader::load_users,
-        structs::{Permissions, PermissionsModifiers, User},
+        structs::{Permissions, PermissionsModifiers, UserExt},
     },
     utils::functions::atleast_one_permission,
 };
@@ -14,7 +14,9 @@ pub fn routes() -> Router {
 }
 
 #[debug_handler]
-async fn admin_get_users(ext: Extension<User>) -> Result<impl IntoResponse, (StatusCode, String)> {
+async fn admin_get_users(
+    ext: Extension<UserExt>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
     if !atleast_one_permission(
         vec![
             Permissions::Users(PermissionsModifiers::Write),

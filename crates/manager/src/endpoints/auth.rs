@@ -8,8 +8,8 @@ use tracing::warn;
 
 use crate::{
     config::{
-        loader::{add_session, get_session, load_service, load_users},
-        structs::{Permissions, User},
+        loader::{add_session, get_groups_perm, get_session, load_service, load_users},
+        structs::{Permissions, UserExt},
     },
     jwt::structs::JWT,
     utils::{functions::atleast_one_permission, hash::hash_str},
@@ -51,13 +51,16 @@ pub async fn auth_middle(
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "User not found".to_string()));
     }
-    if !atleast_one_permission(vec![Permissions::Login], &user.unwrap().permissions) {
+    let user = user.unwrap();
+    let perms = get_groups_perm(user.groups.clone()).await;
+    if !atleast_one_permission(vec![Permissions::Login], &perms) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
-    r.extensions_mut().insert(User {
-        username: user.unwrap().username.clone(),
-        password: user.unwrap().password.clone(),
-        permissions: user.unwrap().permissions.clone(),
+    r.extensions_mut().insert(UserExt {
+        username: user.username.clone(),
+        password: user.password.clone(),
+        groups: user.groups.clone(),
+        permissions: perms,
     });
     Ok(n.run(r).await)
 }
@@ -84,7 +87,9 @@ pub async fn login(h: HeaderMap) -> Result<impl IntoResponse, (StatusCode, Strin
     if user.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()));
     }
-    if !atleast_one_permission(vec![Permissions::Login], &user.unwrap().permissions) {
+    let user = user.unwrap();
+    let perms = get_groups_perm(user.clone().groups).await;
+    if !atleast_one_permission(vec![Permissions::Login], &perms) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
     let service = load_service().await;

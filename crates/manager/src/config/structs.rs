@@ -26,6 +26,14 @@ pub enum Permissions {
 pub struct User {
     pub username: String,
     pub password: String,
+    pub groups: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct UserExt {
+    pub username: String,
+    pub password: String,
+    pub groups: Vec<String>,
     pub permissions: Vec<Permissions>,
 }
 
@@ -57,3 +65,5 @@ pub struct Session {
     pub login: i64,
     pub exp: i64,
 }
+
+pub type GroupsConfig = HashMap<String, Vec<Permissions>>;
