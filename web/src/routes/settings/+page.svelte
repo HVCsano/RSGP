@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 
 	let ses_clone = $state(data.sessions);
 </script>
@@ -34,9 +35,29 @@
 			<Table.Body>
 				{#each data.sessions as s, i}
 					<Table.Row>
-						<Table.Cell>{s.agent}</Table.Cell>
-						<Table.Cell>{new Date(s.login_time * 1000)}</Table.Cell>
-						<Table.Cell>{new Date(s.exp_time * 1000)}</Table.Cell>
+						<Table.Cell
+							><ScrollArea orientation="horizontal" class="mx-auto w-full md:w-[20dvw]"
+								>{s.agent}</ScrollArea
+							></Table.Cell
+						>
+						<Table.Cell
+							>{new Date(s.login_time * 1000).getFullYear()}. {new Date(
+								s.login_time * 1000
+							).getMonth()}. {new Date(s.login_time * 1000).getDate()}. {new Date(
+								s.login_time * 1000
+							).getHours()}:{new Date(s.login_time * 1000).getMinutes()}:{new Date(
+								s.login_time * 1000
+							).getSeconds()}</Table.Cell
+						>
+						<Table.Cell
+							>{new Date(s.exp_time * 1000).getFullYear()}. {new Date(
+								s.exp_time * 1000
+							).getMonth()}. {new Date(s.exp_time * 1000).getDate()}. {new Date(
+								s.exp_time * 1000
+							).getHours()}:{new Date(s.exp_time * 1000).getMinutes()}:{new Date(
+								s.exp_time * 1000
+							).getSeconds()}</Table.Cell
+						>
 						<Table.Cell class="flex items-center justify-center gap-2">
 							<form action="?/changename" method="POST">
 								<input type="text" name="id" bind:value={ses_clone[i].id} hidden />
