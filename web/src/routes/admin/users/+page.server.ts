@@ -6,6 +6,11 @@ export const load = (async ({ cookies }) => {
     const getusers = await fetch(`${apiUrl}/user/admin/users/get`, {
         headers: { "Authorization": `Bearer ${cookies.get("session")}` },
     });
+    const getgroups = await fetch(`${apiUrl}/user/admin/users/getgroups`, {
+        headers: {
+            "Authorization": `Bearer ${cookies.get("session")!}`,
+        },
+    });
     if (getusers.ok) {
         const users: {
             [key: string]: {
@@ -13,7 +18,8 @@ export const load = (async ({ cookies }) => {
                 groups: string[];
             };
         } = await getusers.json();
-        return { users };
+        const groups: string[] = await getgroups.json();
+        return { users, groups };
     }
     throw redirect(302, "/admin");
 }) satisfies PageServerLoad;
