@@ -8,6 +8,8 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { checkAdvancedPerms } from '$lib/api';
+
+	let users_clone = $state(Object.keys(data.users));
 </script>
 
 <svelte:head>
@@ -22,7 +24,7 @@
 </div>
 
 <div class="mx-2 flex flex-wrap gap-2">
-	{#each Object.keys(data.users) as user}
+	{#each Object.keys(data.users) as user, i}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>{user}</Card.Title>
@@ -57,7 +59,6 @@
 					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
 						>Change group</Button
 					>
-
 					<Dialog.Root>
 						<Dialog.Trigger
 							><Button
@@ -69,7 +70,7 @@
 						>
 						<Dialog.Content>
 							<Dialog.Header>
-								<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
+								<Dialog.Title>Are you absolutely sure?</Dialog.Title>
 								<Dialog.Description>
 									This action cannot be undone. This will permanently delete the user and remove all
 									sessions.
@@ -77,7 +78,7 @@
 							</Dialog.Header>
 							<Dialog.Footer>
 								<form action="?/deleteuser" method="POST">
-									<input type="text" name="user" id="user" value={user} />
+									<input type="text" name="user" id="user" hidden bind:value={users_clone[i]} />
 									<Button variant="destructive" type="submit">Delete</Button>
 								</form>
 							</Dialog.Footer>

@@ -1,14 +1,23 @@
 use axum::{
-    Extension, Json, Router, debug_handler, middleware, response::IntoResponse, routing::get,
+    Extension, Json, Router, debug_handler, middleware,
+    response::IntoResponse,
+    routing::{get, post},
 };
 
 use crate::{config::structs::UserExt, endpoints::auth};
 
 mod admin;
+mod session;
 
 pub fn routes() -> Router {
     Router::new()
         .route("/", get(auth_home))
+        .route("/sessions/get", get(session::user_get_sessions))
+        .route("/sessions/remove", post(session::user_post_remove_session))
+        .route(
+            "/sessions/remove_all",
+            post(session::user_post_remove_all_session),
+        )
         .nest("/admin", admin::routes())
         .layer(middleware::from_fn(auth::auth_middle))
 }
