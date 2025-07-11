@@ -12,6 +12,7 @@ mod session;
 pub fn routes() -> Router {
     Router::new()
         .route("/", get(auth_home))
+        .route("/sessions/changename", post(session::user_post_change_name))
         .route("/sessions/get", get(session::user_get_sessions))
         .route("/sessions/remove", post(session::user_post_remove_session))
         .route(

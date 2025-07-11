@@ -1,4 +1,5 @@
 import { apiUrl } from "$lib/api";
+import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load = (async ({ cookies }) => {
@@ -19,6 +20,21 @@ export const load = (async ({ cookies }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
+    changename: async ({ cookies, request }) => {
+        const data = await request.formData();
+        const session = cookies.get("session")!;
+        const id = data.get("id")!.toString();
+        const name = data.get("name")!.toString();
+        await fetch(`${apiUrl}/user/sessions/changename`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${session}`,
+                "session_id": id,
+                "name": encodeURI(name),
+            },
+        });
+        throw redirect(302, new URL(request.url).pathname);
+    },
     remove: async ({ cookies, request }) => {
         const data = await request.formData();
         const session = cookies.get("session")!;
@@ -30,8 +46,9 @@ export const actions = {
                 "session_id": id,
             },
         });
+        throw redirect(302, new URL(request.url).pathname);
     },
-    remove_all: async ({ cookies }) => {
+    remove_all: async ({ cookies, request }) => {
         const session = cookies.get("session")!;
         await fetch(`${apiUrl}/user/sessions/remove_all`, {
             method: "POST",
@@ -39,5 +56,6 @@ export const actions = {
                 "Authorization": `Bearer ${session}`,
             },
         });
+        throw redirect(302, new URL(request.url).pathname);
     },
 } satisfies Actions;

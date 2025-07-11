@@ -6,6 +6,9 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 
@@ -16,7 +19,7 @@
 	<title>RSGP - User Settings</title>
 </svelte:head>
 
-<h1 class="text-center">TODO: Password change, Sessions name change</h1>
+<h1 class="text-center">TODO: Password change</h1>
 
 <div class="mx-auto flex w-full flex-wrap items-center justify-center px-8">
 	<Card.Root class="w-full">
@@ -59,10 +62,26 @@
 							).getSeconds()}</Table.Cell
 						>
 						<Table.Cell class="flex items-center justify-center gap-2">
-							<form action="?/changename" method="POST">
-								<input type="text" name="id" bind:value={ses_clone[i].id} hidden />
-								<Button type="submit">Change name</Button>
-							</form>
+							<Dialog.Root>
+								<Dialog.Trigger>
+									<Button type="submit">Change name</Button>
+								</Dialog.Trigger>
+								<Dialog.Content>
+									<form action="?/changename" method="POST">
+										<Dialog.Header>
+											<Dialog.Title>Change name dialog</Dialog.Title>
+											<Dialog.Description>
+												<Label for="name">Enter new name</Label>
+												<Input type="text" name="name" id="name" />
+											</Dialog.Description>
+										</Dialog.Header>
+										<Dialog.Footer class="mt-2">
+											<input type="text" name="id" bind:value={ses_clone[i].id} hidden />
+											<Button type="submit">Change name</Button>
+										</Dialog.Footer>
+									</form>
+								</Dialog.Content>
+							</Dialog.Root>
 							<AlertDialog.Root>
 								<AlertDialog.Trigger
 									><Button variant="destructive">Log out</Button></AlertDialog.Trigger
