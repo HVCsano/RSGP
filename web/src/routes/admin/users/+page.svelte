@@ -5,6 +5,9 @@
 
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { checkAdvancedPerms } from '$lib/api';
@@ -18,9 +21,30 @@
 
 <div class="flex items-center justify-center gap-4">
 	<h1 class="text-3xl font-bold">Users:</h1>
-	<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
-		><PlusIcon /></Button
-	>
+	<Dialog.Root>
+		<Dialog.Trigger>
+			<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}>
+				<PlusIcon />
+			</Button>
+		</Dialog.Trigger>
+		<Dialog.Content>
+			<form action="?/adduser" method="POST">
+				<Dialog.Header>
+					<Dialog.Title>Add new user</Dialog.Title>
+					<Dialog.Description>This will create a new user with no groups.</Dialog.Description>
+				</Dialog.Header>
+				<div class="my-4 flex flex-col gap-2">
+					<Label for="username">Username</Label>
+					<Input name="username" id="username" type="text" />
+					<Label for="password">Password</Label>
+					<Input name="password" id="password" type="password" />
+				</div>
+				<Dialog.Footer>
+					<Button type="submit">Add user</Button>
+				</Dialog.Footer>
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
 </div>
 
 <div class="mx-2 flex flex-wrap gap-2">
@@ -44,16 +68,24 @@
 							></Dialog.Trigger
 						>
 						<Dialog.Content>
-							<Dialog.Header>
-								<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
-								<Dialog.Description>
-									This action cannot be undone. This will permanently delete your account and remove
-									your data from our servers.
-								</Dialog.Description>
-							</Dialog.Header>
-							<Dialog.Footer>
-								<Button type="submit">Save changes</Button>
-							</Dialog.Footer>
+							<form action="?/changepassword" method="POST">
+								<Dialog.Header>
+									<Dialog.Title>Change password</Dialog.Title>
+									<Dialog.Description>This will change the user's password.</Dialog.Description>
+								</Dialog.Header>
+								<div class="my-4 flex flex-col gap-2">
+									<input type="text" name="user" hidden bind:value={users_clone[i]} />
+									<Label for="password">New password</Label>
+									<Input name="password" type="password" id="password" />
+									<div class="flex w-full items-center justify-between">
+										<Label for="clearsessions">Log out user from everywhere</Label>
+										<Checkbox name="clearsessions" id="clearsessions" />
+									</div>
+								</div>
+								<Dialog.Footer>
+									<Button type="submit">Change password</Button>
+								</Dialog.Footer>
+							</form>
 						</Dialog.Content>
 					</Dialog.Root>
 					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}

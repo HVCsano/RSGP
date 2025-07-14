@@ -36,6 +36,45 @@ export const actions = {
                 "user": user!.toString(),
             },
         });
-        throw redirect(302, "/admin/users");
+        throw redirect(302, new URL(request.url).pathname);
+    },
+    changepassword: async ({ cookies, request }) => {
+        const data = await request.formData();
+        const newpassword = data.get("password");
+        const user = data.get("user");
+        const clearsessions = !!data.get("clearsessions");
+        await fetch(
+            `${apiUrl}/user/admin/users/changepassword`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${cookies.get("session")}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    user,
+                    password: newpassword,
+                    clearsessions,
+                }),
+            },
+        );
+        throw redirect(302, new URL(request.url).pathname);
+    },
+    adduser: async ({ cookies, request }) => {
+        const data = await request.formData();
+        const password = data.get("password");
+        const username = data.get("username");
+        await fetch(`${apiUrl}/user/admin/users/new`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${cookies.get("session")}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username,
+                password,
+            }),
+        });
+        throw redirect(302, new URL(request.url).pathname);
     },
 } satisfies Actions;
