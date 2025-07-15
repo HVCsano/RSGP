@@ -28,13 +28,15 @@ export const actions = {
     deleteuser: async ({ cookies, request }) => {
         const data = await request.formData();
         const user = data.get("user");
-        await fetch(`${apiUrl}/user/admin/users/post`, {
+        await fetch(`${apiUrl}/user/admin/users/delete`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${cookies.get("session")}`,
-                "modify": "delete",
-                "user": user!.toString(),
+                "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+                user,
+            }),
         });
         throw redirect(302, new URL(request.url).pathname);
     },
@@ -73,6 +75,23 @@ export const actions = {
             body: JSON.stringify({
                 username,
                 password,
+            }),
+        });
+        throw redirect(302, new URL(request.url).pathname);
+    },
+    changegroups: async ({ cookies, request }) => {
+        const data = await request.formData();
+        const groups = data.get("groups");
+        const user = data.get("user");
+        await fetch(`${apiUrl}/user/admin/users/changegroup`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${cookies.get("session")}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user,
+                groups: groups?.toString().split(","),
             }),
         });
         throw redirect(302, new URL(request.url).pathname);

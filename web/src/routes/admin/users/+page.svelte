@@ -8,11 +8,18 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { checkAdvancedPerms } from '$lib/api';
 
+	let multiselect: string[] = $state([]);
+
 	let users_clone = $state(Object.keys(data.users));
+
+	function changegrouptrigger(user: string) {
+		multiselect = data.users[user].groups;
+	}
 </script>
 
 <svelte:head>
@@ -88,9 +95,40 @@
 							</form>
 						</Dialog.Content>
 					</Dialog.Root>
-					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
-						>Change group</Button
-					>
+					<Dialog.Root>
+						<Dialog.Trigger onclick={() => changegrouptrigger(user)}>
+							<Button
+								class="w-full"
+								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+								>Change groups</Button
+							>
+						</Dialog.Trigger>
+						<Dialog.Content>
+							<form action="?/changegroups" method="POST">
+								<Dialog.Header>
+									<Dialog.Title>Change groups</Dialog.Title>
+									<Dialog.Description>Change the users groups</Dialog.Description>
+								</Dialog.Header>
+								<div class="my-4 flex flex-col gap-2">
+									<div class="flex items-center justify-between">
+										<Select.Root bind:value={multiselect} type="multiple">
+											<Select.Trigger class="w-[180px]">Select groups</Select.Trigger>
+											<Select.Content>
+												{#each data.groups as group}
+													<Select.Item value={group}>{group}</Select.Item>
+												{/each}
+											</Select.Content>
+										</Select.Root>
+										<input hidden name="groups" type="text" bind:value={multiselect} />
+										<input type="text" name="user" id="user" hidden bind:value={users_clone[i]} />
+									</div>
+								</div>
+								<Dialog.Footer>
+									<Button type="submit">Save changes</Button>
+								</Dialog.Footer>
+							</form>
+						</Dialog.Content>
+					</Dialog.Root>
 					<Dialog.Root>
 						<Dialog.Trigger
 							><Button

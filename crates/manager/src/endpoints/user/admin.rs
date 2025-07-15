@@ -1,6 +1,5 @@
 use axum::{
     Extension, Json, Router, debug_handler,
-    http::HeaderMap,
     response::IntoResponse,
     routing::{get, post},
 };
@@ -19,8 +18,9 @@ pub fn routes() -> Router {
     Router::new()
         .route("/users/get", get(admin_get_users))
         .route("/users/changepassword", post(admin_change_user_password))
+        .route("/users/changegroup", post(admin_change_user_group))
         .route("/users/new", post(admin_add_user))
-        .route("/users/post", post(admin_post_users))
+        .route("/users/delete", post(admin_delete_user))
         .route("/users/getgroups", get(admin_get_user_groups))
         .route("/groups/get", get(admin_get_groups))
 }
@@ -42,10 +42,15 @@ async fn admin_get_users(
     Ok(Json(users))
 }
 
+#[derive(Debug, Deserialize)]
+struct DeleteUserBody {
+    user: String,
+}
+
 #[debug_handler]
-async fn admin_post_users(
-    h: HeaderMap,
+async fn admin_delete_user(
     ext: Extension<UserExt>,
+    Json(b): Json<DeleteUserBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     if !atleast_one_permission(
         vec![
@@ -56,80 +61,19 @@ async fn admin_post_users(
     ) {
         return Err((StatusCode::FORBIDDEN, "No access to users list".to_string()));
     }
-    let user = h.get("user");
-    let modify = h.get("modify");
-    if user.is_none() || modify.is_none() {
-        return Err((
-            StatusCode::NOT_ACCEPTABLE,
-            "Modifiers are required (user, modify)".to_string(),
-        ));
-    }
-    let user = user.unwrap().to_str().unwrap();
-    let modify = modify.unwrap().to_str().unwrap();
     let mut users = load_users().await;
-    let our_user = users.get(user);
+    let our_user = users.get(&b.user);
     if our_user.clone().is_none() {
         return Err((StatusCode::NOT_FOUND, "No user found".to_string()));
     }
-    let mut our_user = our_user.unwrap().clone();
-    if modify == "delete" {
-        users.remove(user);
-        let mut sessions = load_sessions().await;
-        for (j, ses) in sessions.clone().iter() {
-            if ses.username == user {
-                sessions.remove(j);
-            }
-        }
-        write_sessions(sessions.clone()).await;
-    }
-    if modify == "addgroup" {
-        let value = h.get("value");
-        if value.is_none() {
-            return Err((StatusCode::BAD_REQUEST, "No value set".to_string()));
-        }
-        let value = value.unwrap().to_str().unwrap();
-        if !our_user.groups.contains(&value.to_string()) {
-            our_user.groups.push(value.to_string());
-            users.insert(
-                user.to_string(),
-                User {
-                    ..our_user.to_owned()
-                },
-            );
+    users.remove(&b.user);
+    let mut sessions = load_sessions().await;
+    for (j, ses) in sessions.clone().iter() {
+        if ses.username == b.user {
+            sessions.remove(j);
         }
     }
-    if modify == "removegroup" {
-        let value = h.get("value");
-        if value.is_none() {
-            return Err((StatusCode::BAD_REQUEST, "No value set".to_string()));
-        }
-        let value = value.unwrap().to_str().unwrap();
-        if our_user.groups.contains(&value.to_string()) {
-            our_user
-                .groups
-                .remove(our_user.groups.iter().position(|p| p == value).unwrap());
-            users.insert(
-                user.to_owned(),
-                User {
-                    ..our_user.to_owned()
-                },
-            );
-        }
-    }
-    if modify == "setgroup" {
-        let value = h.get("value");
-        if value.is_none() {
-            return Err((StatusCode::BAD_REQUEST, "No value set".to_string()));
-        }
-        let value = value.unwrap().to_str().unwrap();
-        users.insert(
-            user.to_owned(),
-            User {
-                groups: vec![value.to_string()],
-                ..our_user.to_owned()
-            },
-        );
-    }
+    write_sessions(sessions.clone()).await;
 
     write_users(users.clone()).await;
     Ok(())
@@ -257,4 +201,35 @@ async fn admin_add_user(
     );
     write_users(users).await;
     return Ok(());
+}
+
+#[derive(Debug, Deserialize)]
+struct ChangeUserGroupBody {
+    user: String,
+    groups: Vec<String>,
+}
+
+async fn admin_change_user_group(
+    e: Extension<UserExt>,
+    Json(b): Json<ChangeUserGroupBody>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::Users(PermissionsModifiers::Write)],
+        &e.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
+    let mut users = load_users().await;
+    let user = users.get(&b.user);
+    if user.is_none() {
+        return Err((StatusCode::NOT_FOUND, "No user found".to_string()));
+    }
+    let mut user = user.unwrap().clone();
+    user.groups = b.groups;
+    users.insert(b.user, user);
+    write_users(users).await;
+    Ok(())
 }
