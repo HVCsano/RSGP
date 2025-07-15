@@ -1,8 +1,4 @@
-use axum::{
-    Extension, Json, Router, debug_handler,
-    response::IntoResponse,
-    routing::{get, post},
-};
+use axum::{Extension, Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
 use serde::Deserialize;
 
@@ -14,19 +10,8 @@ use crate::{
     utils::{functions::atleast_one_permission, hash::hash_str},
 };
 
-pub fn routes() -> Router {
-    Router::new()
-        .route("/users/get", get(admin_get_users))
-        .route("/users/changepassword", post(admin_change_user_password))
-        .route("/users/changegroup", post(admin_change_user_group))
-        .route("/users/new", post(admin_add_user))
-        .route("/users/delete", post(admin_delete_user))
-        .route("/users/getgroups", get(admin_get_user_groups))
-        .route("/groups/get", get(admin_get_groups))
-}
-
 #[debug_handler]
-async fn admin_get_users(
+pub async fn admin_get_users(
     ext: Extension<UserExt>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     if !atleast_one_permission(
@@ -43,12 +28,12 @@ async fn admin_get_users(
 }
 
 #[derive(Debug, Deserialize)]
-struct DeleteUserBody {
+pub struct DeleteUserBody {
     user: String,
 }
 
 #[debug_handler]
-async fn admin_delete_user(
+pub async fn admin_delete_user(
     ext: Extension<UserExt>,
     Json(b): Json<DeleteUserBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
@@ -80,7 +65,7 @@ async fn admin_delete_user(
 }
 
 #[debug_handler]
-async fn admin_get_user_groups(
+pub async fn admin_get_user_groups(
     ext: Extension<UserExt>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     if !atleast_one_permission(
@@ -100,35 +85,15 @@ async fn admin_get_user_groups(
     Ok(Json(grouplist))
 }
 
-#[debug_handler]
-async fn admin_get_groups(
-    ext: Extension<UserExt>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
-    if !atleast_one_permission(
-        vec![
-            Permissions::Groups(PermissionsModifiers::Write),
-            Permissions::Groups(PermissionsModifiers::Read),
-        ],
-        &ext.permissions,
-    ) {
-        return Err((
-            StatusCode::FORBIDDEN,
-            "No access to groups list".to_string(),
-        ));
-    }
-    let groups = load_groups().await;
-    Ok(Json(groups))
-}
-
 #[derive(Debug, Deserialize)]
-struct ChangeUserPasswordBody {
+pub struct ChangeUserPasswordBody {
     user: String,
     password: String,
     clearsessions: bool,
 }
 
 #[debug_handler]
-async fn admin_change_user_password(
+pub async fn admin_change_user_password(
     ext: Extension<UserExt>,
     Json(b): Json<ChangeUserPasswordBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
@@ -166,13 +131,13 @@ async fn admin_change_user_password(
 }
 
 #[derive(Debug, Deserialize)]
-struct AddUserBody {
+pub struct AddUserBody {
     username: String,
     password: String,
 }
 
 #[debug_handler]
-async fn admin_add_user(
+pub async fn admin_add_user(
     ext: Extension<UserExt>,
     Json(b): Json<AddUserBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
@@ -204,12 +169,12 @@ async fn admin_add_user(
 }
 
 #[derive(Debug, Deserialize)]
-struct ChangeUserGroupBody {
+pub struct ChangeUserGroupBody {
     user: String,
     groups: Vec<String>,
 }
 
-async fn admin_change_user_group(
+pub async fn admin_change_user_group(
     e: Extension<UserExt>,
     Json(b): Json<ChangeUserGroupBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
