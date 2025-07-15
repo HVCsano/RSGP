@@ -10,6 +10,8 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+
+	let gc = $state(Object.keys(data.groups));
 </script>
 
 <svelte:head>
@@ -43,7 +45,7 @@
 </div>
 
 <div class="mx-2 flex flex-wrap gap-2">
-	{#each Object.keys(data.groups) as gr}
+	{#each Object.keys(data.groups) as gr, i}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>{gr}</Card.Title>
@@ -63,11 +65,30 @@
 					<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Groups', ['Write'])}
 						>Change permissions</Button
 					>
-					<Button
-						variant="destructive"
-						disabled={!checkAdvancedPerms(data.layout!.permissions, 'Groups', ['Write'])}
-						>Delete group</Button
-					>
+					<Dialog.Root>
+						<Dialog.Trigger
+							><Button
+								class="w-full"
+								variant="destructive"
+								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Groups', ['Write'])}
+								>Delete group</Button
+							></Dialog.Trigger
+						>
+						<Dialog.Content>
+							<Dialog.Header>
+								<Dialog.Title>Are you absolutely sure?</Dialog.Title>
+								<Dialog.Description>
+									This action cannot be undone. This will permanently delete the group.
+								</Dialog.Description>
+							</Dialog.Header>
+							<Dialog.Footer>
+								<form action="?/deletegroup" method="POST">
+									<input type="text" name="name" id="name" hidden bind:value={gc[i]} />
+									<Button variant="destructive" type="submit">Delete</Button>
+								</form>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
 				</div>
 			</Card.Footer>
 		</Card.Root>

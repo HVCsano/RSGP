@@ -18,4 +18,6 @@ pub fn routes() -> Router {
         .route("/users/delete", post(users::admin_delete_user))
         .route("/users/getgroups", get(users::admin_get_user_groups))
         .route("/groups/get", get(groups::admin_get_groups))
+        .route("/groups/add", post(groups::admin_add_group))
+        .route("/groups/remove", post(groups::admin_groups_remove))
 }

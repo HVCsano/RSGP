@@ -93,6 +93,18 @@ pub async fn write_users(conf: UsersConfig) {
         .await
         .unwrap();
 }
+pub async fn write_groups(conf: GroupsConfig) {
+    let mut groups = File::options()
+        .write(true)
+        .truncate(true)
+        .open("./config/groups.json")
+        .await
+        .unwrap();
+    groups
+        .write_all(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
+        .await
+        .unwrap();
+}
 
 pub async fn load_groups() -> GroupsConfig {
     let groups = File::open("./config/groups.json").await.unwrap();

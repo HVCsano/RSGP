@@ -1,10 +1,11 @@
 use axum::{Extension, Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
+use serde::Deserialize;
 
 use crate::{
     config::{
-        loader::load_groups,
-        structs::{Permissions, PermissionsModifiers, UserExt},
+        loader::{load_groups, load_users, write_groups, write_users},
+        structs::{Permissions, PermissionsModifiers, User, UserExt},
     },
     utils::functions::atleast_one_permission,
 };
@@ -27,4 +28,77 @@ pub async fn admin_get_groups(
     }
     let groups = load_groups().await;
     Ok(Json(groups))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AddGroupBody {
+    name: String,
+}
+
+#[debug_handler]
+pub async fn admin_add_group(
+    ext: Extension<UserExt>,
+    Json(b): Json<AddGroupBody>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::Groups(PermissionsModifiers::Write)],
+        &ext.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
+    let mut groups = load_groups().await;
+
+    let our_group = groups.get(&b.name);
+    if our_group.is_some() {
+        return Err((StatusCode::BAD_REQUEST, "User already exists".to_string()));
+    }
+
+    groups.insert(b.name, Vec::new());
+    write_groups(groups).await;
+    return Ok(());
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GroupsRemoveBody {
+    name: String,
+}
+
+#[debug_handler]
+pub async fn admin_groups_remove(
+    e: Extension<UserExt>,
+    Json(b): Json<GroupsRemoveBody>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::Groups(PermissionsModifiers::Write)],
+        &e.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
+    let mut groups = load_groups().await;
+    let our_group = groups.get(&b.name);
+    if our_group.is_none() {
+        return Err((StatusCode::NOT_FOUND, "Group not found".to_string()));
+    }
+    groups.remove(&b.name);
+    write_groups(groups).await;
+    let mut users = load_users().await;
+    for (k, v) in users.clone().iter() {
+        if v.groups.contains(&b.name) {
+            let mut groups = v.groups.clone();
+            groups.remove(groups.iter().position(|p| p == &b.name).unwrap());
+            let newuser = User {
+                groups,
+                password: v.password.clone(),
+            };
+            users.insert(k.clone(), newuser);
+        }
+    }
+    write_users(users).await;
+    Ok(())
 }
