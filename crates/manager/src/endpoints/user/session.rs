@@ -3,9 +3,12 @@ use reqwest::StatusCode;
 use serde::Serialize;
 use urlencoding::decode;
 
-use crate::config::{
-    loader::{load_sessions, write_sessions},
-    structs::{Session, UserExt},
+use crate::{
+    config::{
+        loader::{load_sessions, write_sessions},
+        structs::{Permissions, PermissionsModifiers, Session, UserExt},
+    },
+    utils::functions::atleast_one_permission,
 };
 
 #[derive(Debug, Serialize)]
@@ -17,7 +20,21 @@ pub struct UserSessionsList {
 }
 
 #[debug_handler]
-pub async fn user_get_sessions(ext: Extension<UserExt>) -> impl IntoResponse {
+pub async fn user_get_sessions(
+    ext: Extension<UserExt>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![
+            Permissions::User(PermissionsModifiers::Read),
+            Permissions::User(PermissionsModifiers::Write),
+        ],
+        &ext.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
     let sessions = load_sessions().await;
     let mut list = Vec::new();
     for (k, v) in sessions.iter() {
@@ -31,7 +48,7 @@ pub async fn user_get_sessions(ext: Extension<UserExt>) -> impl IntoResponse {
             exp_time: v.exp,
         })
     }
-    Json(list)
+    Ok(Json(list))
 }
 
 #[debug_handler]
@@ -39,6 +56,15 @@ pub async fn user_post_remove_session(
     h: HeaderMap,
     ext: Extension<UserExt>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::User(PermissionsModifiers::Write)],
+        &ext.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
     let session = h.get("session_id");
     if session.is_none() {
         return Err((
@@ -66,6 +92,15 @@ pub async fn user_post_change_name(
     h: HeaderMap,
     ext: Extension<UserExt>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::User(PermissionsModifiers::Write)],
+        &ext.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
     let session = h.get("session_id");
     let newname = h.get("name");
     if session.is_none() || newname.is_none() {
@@ -98,6 +133,15 @@ pub async fn user_post_change_name(
 pub async fn user_post_remove_all_session(
     ext: Extension<UserExt>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::User(PermissionsModifiers::Write)],
+        &ext.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
     let mut sessions = load_sessions().await;
     for (k, v) in sessions.clone().iter() {
         if v.username != ext.username {

@@ -11,6 +11,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { checkAdvancedPerms } from '$lib/api';
 
 	let ses_clone = $state(data.sessions);
 </script>
@@ -64,7 +65,11 @@
 						<Table.Cell class="flex items-center justify-center gap-2">
 							<Dialog.Root>
 								<Dialog.Trigger>
-									<Button type="submit">Change name</Button>
+									<Button
+										type="submit"
+										disabled={!checkAdvancedPerms(data.layout!.permissions, 'User', ['Write'])}
+										>Change name</Button
+									>
 								</Dialog.Trigger>
 								<Dialog.Content>
 									<form action="?/changename" method="POST">
@@ -84,7 +89,11 @@
 							</Dialog.Root>
 							<AlertDialog.Root>
 								<AlertDialog.Trigger
-									><Button variant="destructive">Log out</Button></AlertDialog.Trigger
+									><Button
+										variant="destructive"
+										disabled={!checkAdvancedPerms(data.layout!.permissions, 'User', ['Write'])}
+										>Log out</Button
+									></AlertDialog.Trigger
 								>
 								<AlertDialog.Content>
 									<AlertDialog.Header>
@@ -110,7 +119,11 @@
 		<Card.Footer>
 			<AlertDialog.Root>
 				<AlertDialog.Trigger
-					><Button variant="destructive">Log out everywhere</Button></AlertDialog.Trigger
+					><Button
+						variant="destructive"
+						disabled={!checkAdvancedPerms(data.layout!.permissions, 'User', ['Write'])}
+						>Log out everywhere</Button
+					></AlertDialog.Trigger
 				>
 				<AlertDialog.Content>
 					<AlertDialog.Header>

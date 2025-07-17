@@ -112,7 +112,7 @@
 								<div class="my-4 flex flex-col gap-2">
 									<div class="flex items-center justify-between">
 										<Select.Root bind:value={multiselect} type="multiple">
-											<Select.Trigger class="w-[180px]">Select groups</Select.Trigger>
+											<Select.Trigger class="w-[180px]">{multiselect}</Select.Trigger>
 											<Select.Content>
 												{#each data.groups as group}
 													<Select.Item value={group}>{group}</Select.Item>
