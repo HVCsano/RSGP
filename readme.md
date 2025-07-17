@@ -14,7 +14,4 @@ The system have 3 components, the web, that is the webpage, the manager, basical
 
 ### Panel features
 
--   Simple user system, and session management
--   Group-based permission system
--   Admin page for listing users, groups
--   Delete users
+-   Panel fully works except Servers, Workers, Eggs, Site Settings.
