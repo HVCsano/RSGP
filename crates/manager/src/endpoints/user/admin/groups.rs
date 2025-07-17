@@ -102,3 +102,108 @@ pub async fn admin_groups_remove(
     write_users(users).await;
     Ok(())
 }
+
+#[derive(Debug, Deserialize)]
+pub struct AdminSetGroupPerms {
+    group: String,
+    perms: Vec<String>,
+}
+
+pub async fn admin_set_group_perms(
+    e: Extension<UserExt>,
+    Json(b): Json<AdminSetGroupPerms>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !atleast_one_permission(
+        vec![Permissions::Groups(PermissionsModifiers::Write)],
+        &e.permissions,
+    ) {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "No access to groups list".to_string(),
+        ));
+    }
+    let mut groups = load_groups().await;
+    let group = groups.get(&b.group);
+    if group.is_none() {
+        return Err((StatusCode::NOT_FOUND, "Group not found".to_string()));
+    }
+    let mut newperms = Vec::new();
+    for perm in b.perms {
+        let end = perm.split("/").collect::<Vec<&str>>();
+        match perm.split("/").collect::<Vec<&str>>()[0] {
+            "login" => newperms.push(Permissions::Login),
+
+            "adminpage" => newperms.push(Permissions::AdminPage),
+
+            "admin" => newperms.push(Permissions::Admin),
+
+            "user" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::User(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::User(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            "users" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::Users(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::Users(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            "groups" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::Groups(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::Groups(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            "servers" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::Servers(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::Servers(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            "workers" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::Workers(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::Workers(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            "eggs" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::Eggs(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::Eggs(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            "sitesettings" => match end[1] {
+                "write" => {
+                    newperms.push(Permissions::SiteSettings(PermissionsModifiers::Write));
+                }
+                "read" => {
+                    newperms.push(Permissions::SiteSettings(PermissionsModifiers::Read));
+                }
+                _ => continue,
+            },
+            _ => continue,
+        };
+    }
+    groups.insert(b.group.clone(), newperms);
+    write_groups(groups).await;
+    Ok(())
+}

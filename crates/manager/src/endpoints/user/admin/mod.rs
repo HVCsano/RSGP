@@ -20,4 +20,5 @@ pub fn routes() -> Router {
         .route("/groups/get", get(groups::admin_get_groups))
         .route("/groups/add", post(groups::admin_add_group))
         .route("/groups/remove", post(groups::admin_groups_remove))
+        .route("/groups/setperms", post(groups::admin_set_group_perms))
 }
