@@ -3,7 +3,7 @@ use reqwest::StatusCode;
 use serde::Deserialize;
 
 use crate::{
-    config::{
+    conf::{
         loader::{load_groups, load_users, write_groups, write_users},
         structs::{Permissions, PermissionsModifiers, User, UserExt},
     },

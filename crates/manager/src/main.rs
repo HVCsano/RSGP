@@ -7,7 +7,7 @@ use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info;
 use tracing_subscriber::FmtSubscriber;
 
-mod config;
+mod conf;
 mod endpoints;
 mod jwt;
 mod utils;
@@ -15,9 +15,9 @@ mod utils;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     tracing::subscriber::set_global_default(FmtSubscriber::default())?;
-    info!("=== RSGP Manager ===");
+    info!("=== RSGP Manager v{} ===", env!("CARGO_PKG_VERSION"));
     info!("Loading configs...");
-    config::loader::load_configs().await;
+    conf::loader::load_configs().await;
     info!("Config loading done, starting server...");
     let app = Router::new()
         .route(

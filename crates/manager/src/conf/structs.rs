@@ -48,8 +48,13 @@ pub struct ServiceConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Workers {
     pub name: String,
-    pub access: String,
+    pub access: WorkerAccess,
     pub key: String,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WorkerAccess {
+    pub address: String,
+    pub port: String,
 }
 
 pub type SessionsConfig = HashMap<String, Session>;
@@ -63,3 +68,33 @@ pub struct Session {
 }
 
 pub type GroupsConfig = HashMap<String, Vec<Permissions>>;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Server {
+    pub owner: String,
+    pub worker: String,
+    pub egg: String,
+}
+
+pub type ServersConfig = HashMap<String, Server>;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Egg {
+    pub install: EggInstallConf,
+    pub running: EggRunConf,
+    pub version: String,
+    pub upstream: String,
+}
+
+pub type EggsConfig = HashMap<String, Egg>;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EggInstallConf {
+    pub dependency_installs: Vec<Vec<String>>,
+    pub egg_installs: Vec<Vec<String>>,
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EggRunConf {
+    pub start_command: String,
+    pub running_text: String,
+}

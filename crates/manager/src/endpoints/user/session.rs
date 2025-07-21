@@ -4,7 +4,7 @@ use serde::Serialize;
 use urlencoding::decode;
 
 use crate::{
-    config::{
+    conf::{
         loader::{load_sessions, write_sessions},
         structs::{Permissions, PermissionsModifiers, Session, UserExt},
     },

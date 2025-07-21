@@ -4,7 +4,7 @@ use axum::{
     routing::{get, post},
 };
 
-use crate::{config::structs::UserExt, endpoints::auth};
+use crate::{conf::structs::UserExt, endpoints::auth};
 
 mod admin;
 mod session;

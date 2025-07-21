@@ -1,4 +1,4 @@
-use crate::config::structs::Permissions;
+use crate::conf::structs::Permissions;
 
 pub fn atleast_one_permission(p: Vec<Permissions>, u: &Vec<Permissions>) -> bool {
     if p.is_empty() || u.is_empty() {

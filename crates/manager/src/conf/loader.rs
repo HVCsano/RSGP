@@ -9,8 +9,9 @@ use tokio::{
 use tracing::{info, warn};
 
 use crate::{
-    config::structs::{
-        GroupsConfig, Permissions, ServiceConfig, Session, SessionsConfig, User, UsersConfig,
+    conf::structs::{
+        EggsConfig, GroupsConfig, Permissions, ServersConfig, ServiceConfig, Session,
+        SessionsConfig, User, UsersConfig,
     },
     utils::hash::hash_str,
 };
@@ -73,6 +74,28 @@ pub async fn load_configs() {
         .await
         .unwrap();
         info!("sessions.json created.")
+    };
+    let eggs = Path::new("./config/eggs.json");
+    if !eggs.exists() {
+        warn!("No eggs.json found, creating empty one.");
+        fs::write(
+            eggs,
+            serde_json::to_string_pretty(&EggsConfig::new()).unwrap(),
+        )
+        .await
+        .unwrap();
+        info!("eggs.json created.")
+    };
+    let servers = Path::new("./config/servers.json");
+    if !servers.exists() {
+        warn!("No servers.json found, creating empty one.");
+        fs::write(
+            servers,
+            serde_json::to_string_pretty(&ServersConfig::new()).unwrap(),
+        )
+        .await
+        .unwrap();
+        info!("servers.json created.")
     };
 }
 

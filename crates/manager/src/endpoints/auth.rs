@@ -7,7 +7,7 @@ use reqwest::StatusCode;
 use tracing::warn;
 
 use crate::{
-    config::{
+    conf::{
         loader::{add_session, get_groups_perm, get_session, load_service, load_users},
         structs::{Permissions, UserExt},
     },
