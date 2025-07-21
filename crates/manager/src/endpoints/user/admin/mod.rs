@@ -5,6 +5,7 @@ use axum::{
 
 mod groups;
 mod users;
+mod workers;
 
 pub fn routes() -> Router {
     Router::new()
@@ -21,4 +22,5 @@ pub fn routes() -> Router {
         .route("/groups/add", post(groups::admin_add_group))
         .route("/groups/remove", post(groups::admin_groups_remove))
         .route("/groups/setperms", post(groups::admin_set_group_perms))
+        .route("/workers/get", get(workers::admin_get_service_workers))
 }

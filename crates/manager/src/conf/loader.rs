@@ -153,6 +153,19 @@ pub async fn load_service() -> ServiceConfig {
     serde_json::from_reader(service.into_std().await).expect("Service config is invalid format.")
 }
 
+pub async fn write_service(conf: ServiceConfig) {
+    let mut service = File::options()
+        .write(true)
+        .truncate(true)
+        .open("./config/service.json")
+        .await
+        .unwrap();
+    service
+        .write(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
+        .await
+        .unwrap();
+}
+
 pub async fn load_sessions() -> SessionsConfig {
     let sessions = File::open("./config/sessions.json").await.unwrap();
     serde_json::from_reader(sessions.into_std().await)
