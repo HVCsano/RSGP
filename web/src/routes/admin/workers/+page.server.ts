@@ -1,4 +1,5 @@
 import { apiUrl } from "$lib/api";
+import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load = (async ({ cookies }) => {
@@ -61,6 +62,7 @@ export const actions = {
                 };
             }
         }
+        throw redirect(302, new URL(request.url).pathname);
     },
     delete: async ({ request, cookies }) => {
         const data = await request.formData();
@@ -75,5 +77,6 @@ export const actions = {
                 worker,
             }),
         });
+        throw redirect(302, new URL(request.url).pathname);
     },
 } satisfies Actions;
