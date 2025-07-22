@@ -81,11 +81,7 @@ pub async fn admin_groups_remove(
         ));
     }
     let mut groups = load_groups().await;
-    let our_group = groups.get(&b.name);
-    if our_group.is_none() {
-        return Err((StatusCode::NOT_FOUND, "Group not found".to_string()));
-    }
-    groups.remove(&b.name);
+    groups.retain(|k, _| k != &b.name);
     write_groups(groups).await;
     let mut users = load_users().await;
     for (k, v) in users.clone().iter() {

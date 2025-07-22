@@ -1,7 +1,5 @@
 <script lang="ts">
-	import type { PageData } from './$types';
-
-	let { data }: { data: PageData } = $props();
+	let { data, form } = $props();
 
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -10,11 +8,15 @@
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Alert from '$lib/components/ui/alert/index.js';
+	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
 	import { checkAdvancedPerms } from '$lib/api';
+
+	let wc = $state(data.workers);
 </script>
 
 <svelte:head>
-	<title>RSGP - Users</title>
+	<title>RSGP - Workers</title>
 </svelte:head>
 
 <div class="flex items-center justify-center gap-4">
@@ -26,16 +28,22 @@
 			</Button>
 		</Dialog.Trigger>
 		<Dialog.Content>
-			<form action="?/adduser" method="POST">
+			<form action="?/addworker" method="POST">
 				<Dialog.Header>
-					<Dialog.Title>Add new user</Dialog.Title>
-					<Dialog.Description>This will create a new user with no groups.</Dialog.Description>
+					<Dialog.Title>Add new worker</Dialog.Title>
+					<Dialog.Description>This will setup a new worker.</Dialog.Description>
 				</Dialog.Header>
 				<div class="my-4 flex flex-col gap-2">
-					<Label for="username">Username</Label>
-					<Input name="username" id="username" type="text" />
-					<Label for="password">Password</Label>
-					<Input name="password" id="password" type="password" />
+					<Label for="name">Worker name</Label>
+					<Input name="name" id="name" type="text" />
+					<Label for="address">Address (IP or Hostname)</Label>
+					<Input name="address" id="address" type="text" />
+					<Label for="port">Port</Label>
+					<Input name="port" id="port" type="number" />
+					<div class="flex items-center justify-between">
+						<Label for="https">Use https</Label>
+						<Checkbox name="https" id="https" />
+					</div>
 				</div>
 				<Dialog.Footer>
 					<Button type="submit">Add user</Button>
@@ -44,6 +52,24 @@
 		</Dialog.Content>
 	</Dialog.Root>
 </div>
+
+{#if form?.addworker.error}
+	<div class="animate-in fade-in mx-auto mt-4 w-[400px] duration-100">
+		<Alert.Root variant="destructive">
+			<AlertCircleIcon />
+			{#if form.addworker.error === 'checkFailed'}
+				<Alert.Title>Worker check failed</Alert.Title>
+				<Alert.Description>Ensure you've added the correct values.</Alert.Description>
+			{/if}
+			{#if form.addworker.error === 'already'}
+				<Alert.Title>Worker create failed</Alert.Title>
+				<Alert.Description
+					>The specified worker has been already added to elsewhere.</Alert.Description
+				>
+			{/if}
+		</Alert.Root>
+	</div>
+{/if}
 
 <div class="mx-2 flex flex-wrap gap-2">
 	{#each data.workers as worker, i}
@@ -71,7 +97,7 @@
 									<Dialog.Description>This will change the user's password.</Dialog.Description>
 								</Dialog.Header>
 								<div class="my-4 flex flex-col gap-2">
-									<input type="text" name="user" hidden bind:value={users_clone[i]} />
+									<input type="text" name="user" hidden bind:value={wc[i].name} />
 									<Label for="password">New password</Label>
 									<Input name="password" type="password" id="password" />
 									<div class="flex w-full items-center justify-between">
@@ -91,20 +117,20 @@
 								class="w-full"
 								variant="destructive"
 								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
-								>Delete user</Button
+								>Delete worker</Button
 							></Dialog.Trigger
 						>
 						<Dialog.Content>
 							<Dialog.Header>
 								<Dialog.Title>Are you absolutely sure?</Dialog.Title>
 								<Dialog.Description>
-									This action cannot be undone. This will permanently delete the user and remove all
-									sessions.
+									This only happens at the manager, to reset the worker, you need to delete the
+									config folder there aswell.
 								</Dialog.Description>
 							</Dialog.Header>
 							<Dialog.Footer>
-								<form action="?/deleteuser" method="POST">
-									<input type="text" name="user" id="user" hidden bind:value={users_clone[i]} />
+								<form action="?/delete" method="POST">
+									<input type="text" name="worker" id="worker" hidden bind:value={wc[i].name} />
 									<Button variant="destructive" type="submit">Delete</Button>
 								</form>
 							</Dialog.Footer>

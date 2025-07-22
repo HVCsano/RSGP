@@ -23,4 +23,10 @@ pub fn routes() -> Router {
         .route("/groups/remove", post(groups::admin_groups_remove))
         .route("/groups/setperms", post(groups::admin_set_group_perms))
         .route("/workers/get", get(workers::admin_get_service_workers))
+        .route("/workers/check", post(workers::admin_check_service_worker))
+        .route("/workers/add", post(workers::admin_add_service_worker))
+        .route(
+            "/workers/delete",
+            post(workers::admin_delete_service_worker),
+        )
 }

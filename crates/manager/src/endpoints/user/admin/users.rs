@@ -47,17 +47,9 @@ pub async fn admin_delete_user(
         return Err((StatusCode::FORBIDDEN, "No access to users list".to_string()));
     }
     let mut users = load_users().await;
-    let our_user = users.get(&b.user);
-    if our_user.clone().is_none() {
-        return Err((StatusCode::NOT_FOUND, "No user found".to_string()));
-    }
-    users.remove(&b.user);
     let mut sessions = load_sessions().await;
-    for (j, ses) in sessions.clone().iter() {
-        if ses.username == b.user {
-            sessions.remove(j);
-        }
-    }
+    users.retain(|k, _| k != &b.user);
+    sessions.retain(|_, v| v.username != b.user);
     write_sessions(sessions.clone()).await;
 
     write_users(users.clone()).await;

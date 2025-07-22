@@ -51,10 +51,17 @@ pub struct Workers {
     pub access: WorkerAccess,
     pub key: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum Protocol {
+    Http,
+    Https,
+}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WorkerAccess {
     pub address: String,
     pub port: String,
+    pub protocol: Protocol,
 }
 
 pub type SessionsConfig = HashMap<String, Session>;
