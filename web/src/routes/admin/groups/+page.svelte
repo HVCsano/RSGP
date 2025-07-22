@@ -345,7 +345,7 @@
 										</Select.Root>
 									</div>
 								</div>
-								<input type="text" name="name" id="name" hidden bind:value={gc[i]} />
+								<input required type="text" name="name" id="name" hidden bind:value={gc[i]} />
 								<input hidden type="text" name="user" value={`user/${permissions.user}`} />
 								<input hidden type="text" name="users" value={`users/${permissions.users}`} />
 								<input hidden type="text" name="groups" value={`groups/${permissions.groups}`} />

@@ -42,9 +42,9 @@
 				</Dialog.Header>
 				<div class="my-4 flex flex-col gap-2">
 					<Label for="username">Username</Label>
-					<Input name="username" id="username" type="text" />
+					<Input name="username" id="username" type="text" required />
 					<Label for="password">Password</Label>
-					<Input name="password" id="password" type="password" />
+					<Input name="password" id="password" type="password" required />
 				</div>
 				<Dialog.Footer>
 					<Button type="submit">Add user</Button>
@@ -83,7 +83,7 @@
 								<div class="my-4 flex flex-col gap-2">
 									<input type="text" name="user" hidden bind:value={users_clone[i]} />
 									<Label for="password">New password</Label>
-									<Input name="password" type="password" id="password" />
+									<Input name="password" type="password" id="password" required />
 									<div class="flex w-full items-center justify-between">
 										<Label for="clearsessions">Log out user from everywhere</Label>
 										<Checkbox name="clearsessions" id="clearsessions" />

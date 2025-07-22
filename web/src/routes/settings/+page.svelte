@@ -77,7 +77,7 @@
 											<Dialog.Title>Change name dialog</Dialog.Title>
 											<Dialog.Description>
 												<Label for="name">Enter new name</Label>
-												<Input type="text" name="name" id="name" />
+												<Input required type="text" name="name" id="name" />
 											</Dialog.Description>
 										</Dialog.Header>
 										<Dialog.Footer class="mt-2">

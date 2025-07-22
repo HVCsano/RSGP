@@ -99,7 +99,7 @@
 								<div class="my-4 flex flex-col gap-2">
 									<input type="text" name="user" hidden bind:value={wc[i].name} />
 									<Label for="password">New password</Label>
-									<Input name="password" type="password" id="password" />
+									<Input name="password" type="password" id="password" required />
 									<div class="flex w-full items-center justify-between">
 										<Label for="clearsessions">Log out user from everywhere</Label>
 										<Checkbox name="clearsessions" id="clearsessions" />
@@ -130,7 +130,14 @@
 							</Dialog.Header>
 							<Dialog.Footer>
 								<form action="?/delete" method="POST">
-									<input type="text" name="worker" id="worker" hidden bind:value={wc[i].name} />
+									<input
+										type="text"
+										name="worker"
+										id="worker"
+										hidden
+										bind:value={wc[i].name}
+										required
+									/>
 									<Button variant="destructive" type="submit">Delete</Button>
 								</form>
 							</Dialog.Footer>
