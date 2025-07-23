@@ -10,6 +10,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
+	import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
 	import { checkAdvancedPerms } from '$lib/api';
 
 	let wc = $state(data.workers);
@@ -74,8 +75,15 @@
 <div class="mx-2 flex flex-wrap gap-2">
 	{#each data.workers as worker, i}
 		<Card.Root>
-			<Card.Header>
-				<Card.Title>{worker.name}</Card.Title>
+			<Card.Header class="flex items-center justify-center gap-1">
+				{#if worker.status}
+					<CheckCircle2Icon class="text-green-500" />
+				{:else}
+					<AlertCircleIcon class="text-red-600" />
+				{/if}
+				<Card.Title class={`${worker.status ? 'text-green-500' : 'text-red-600'}`}
+					>{worker.name}</Card.Title
+				>
 			</Card.Header>
 			<Card.Content>
 				<h1 class="text-lg font-bold">Servers:</h1>

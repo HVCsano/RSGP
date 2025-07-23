@@ -30,6 +30,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }),
         )
         .route("/setup", post(setup_worker))
+        .nest("/a", endpoints::routes())
         .layer(ServiceBuilder::new().layer(CorsLayer::permissive()))
         .layer(TraceLayer::new_for_http())
         .layer(CookieManagerLayer::new());

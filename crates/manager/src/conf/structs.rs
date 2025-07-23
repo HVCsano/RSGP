@@ -90,7 +90,7 @@ pub struct Egg {
     pub install: EggInstallConf,
     pub running: EggRunConf,
     pub version: String,
-    pub upstream: String,
+    pub upstream: Option<String>,
 }
 
 pub type EggsConfig = HashMap<String, Egg>;

@@ -31,9 +31,7 @@ pub async fn admin_get_service_workers(
 
 #[derive(Debug, Deserialize)]
 pub struct CheckServiceWorkerBody {
-    pub address: String,
-    pub port: u16,
-    pub protocol: Protocol,
+    pub name: String,
 }
 
 #[debug_handler]
@@ -42,7 +40,10 @@ pub async fn admin_check_service_worker(
     Json(b): Json<CheckServiceWorkerBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     if !atleast_one_permission(
-        vec![Permissions::Workers(PermissionsModifiers::Write)],
+        vec![
+            Permissions::Workers(PermissionsModifiers::Read),
+            Permissions::Workers(PermissionsModifiers::Write),
+        ],
         &e.permissions,
     ) {
         return Err((
@@ -50,14 +51,23 @@ pub async fn admin_check_service_worker(
             "No access to workers list".to_string(),
         ));
     }
+    let workers = load_service().await.workers;
+    let our_worker = workers.iter().find(|p| p.name == b.name);
+    if our_worker.is_none() {
+        return Err((
+            StatusCode::NOT_FOUND,
+            "No worker found matching the name.".to_string(),
+        ));
+    }
+    let our_worker = our_worker.unwrap();
     let check = reqwest::get(format!(
-        "{}://{}:{}",
-        match b.protocol {
+        "{}://{}:{}/a",
+        match our_worker.access.protocol {
             Protocol::Http => "http",
             Protocol::Https => "https",
         },
-        b.address,
-        b.port
+        our_worker.access.address,
+        our_worker.access.port
     ))
     .await;
     if check.is_ok() {

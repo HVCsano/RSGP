@@ -10,7 +10,32 @@ export const load = (async ({ cookies }) => {
         name: string;
         access: { address: string; port: string };
         key: string;
+        status: boolean;
     }[] = await getworkers.json();
+    for (let i = 0; i < workers.length; i++) {
+        const w = workers[i];
+        const check = await fetch(`${apiUrl}/user/admin/workers/check`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${cookies.get("session")}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: w.name,
+            }),
+        });
+        if (!check.ok) {
+            workers[i] = {
+                ...w,
+                status: false,
+            };
+            continue;
+        }
+        workers[i] = {
+            ...w,
+            status: true,
+        };
+    }
     return { workers };
 }) satisfies PageServerLoad;
 
@@ -21,25 +46,6 @@ export const actions = {
         const name = data.get("name") as string;
         const port = data.get("port") as string;
         const https = !!data.get("https");
-        const check = await fetch(`${apiUrl}/user/admin/workers/check`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${cookies.get("session")}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                address,
-                port: Number(port),
-                protocol: https ? "Https" : "Http",
-            }),
-        });
-        if (!check.ok) {
-            return {
-                addworker: {
-                    error: "checkFailed",
-                },
-            };
-        }
         const add = await fetch(`${apiUrl}/user/admin/workers/add`, {
             method: "POST",
             headers: {
