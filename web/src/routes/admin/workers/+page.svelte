@@ -124,7 +124,7 @@
 							><Button
 								class="w-full"
 								variant="destructive"
-								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Users', ['Write'])}
+								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Workers', ['Write'])}
 								>Delete worker</Button
 							></Dialog.Trigger
 						>

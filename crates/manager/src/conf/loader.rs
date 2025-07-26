@@ -116,6 +116,7 @@ pub async fn write_users(conf: UsersConfig) {
         .await
         .unwrap();
 }
+
 pub async fn write_groups(conf: GroupsConfig) {
     let mut groups = File::options()
         .write(true)
@@ -172,6 +173,16 @@ pub async fn load_sessions() -> SessionsConfig {
         .expect("Sessions config is in invalid format.")
 }
 
+pub async fn load_eggs() -> EggsConfig {
+    let eggs = File::open("./config/eggs.json").await.unwrap();
+    serde_json::from_reader(eggs.into_std().await).expect("Eggs config is in invalid format.")
+}
+
+pub async fn load_servers() -> ServersConfig {
+    let servers = File::open("./config/servers.json").await.unwrap();
+    serde_json::from_reader(servers.into_std().await).expect("Servers config is in invalid format.")
+}
+
 pub async fn write_sessions(conf: SessionsConfig) {
     let mut sessions = File::options()
         .write(true)
@@ -180,6 +191,31 @@ pub async fn write_sessions(conf: SessionsConfig) {
         .await
         .unwrap();
     sessions
+        .write(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
+        .await
+        .unwrap();
+}
+
+pub async fn write_eggs(conf: EggsConfig) {
+    let mut eggs = File::options()
+        .write(true)
+        .truncate(true)
+        .open("./config/eggs.json")
+        .await
+        .unwrap();
+    eggs.write(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
+        .await
+        .unwrap();
+}
+
+pub async fn write_servers(conf: ServersConfig) {
+    let mut servers = File::options()
+        .write(true)
+        .truncate(true)
+        .open("./config/servers.json")
+        .await
+        .unwrap();
+    servers
         .write(serde_json::to_string_pretty(&conf).unwrap().as_bytes())
         .await
         .unwrap();

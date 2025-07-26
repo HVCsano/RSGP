@@ -10,6 +10,7 @@ use crate::{
     utils::functions::atleast_one_permission,
 };
 
+#[debug_handler]
 pub async fn admin_get_service_workers(
     e: Extension<UserExt>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {

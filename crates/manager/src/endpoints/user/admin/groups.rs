@@ -105,6 +105,7 @@ pub struct AdminSetGroupPerms {
     perms: Vec<String>,
 }
 
+#[debug_handler]
 pub async fn admin_set_group_perms(
     e: Extension<UserExt>,
     Json(b): Json<AdminSetGroupPerms>,

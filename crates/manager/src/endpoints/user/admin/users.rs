@@ -166,6 +166,7 @@ pub struct ChangeUserGroupBody {
     groups: Vec<String>,
 }
 
+#[debug_handler]
 pub async fn admin_change_user_group(
     e: Extension<UserExt>,
     Json(b): Json<ChangeUserGroupBody>,

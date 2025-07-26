@@ -77,10 +77,20 @@ pub struct Session {
 pub type GroupsConfig = HashMap<String, Vec<Permissions>>;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ServerStates {
+    Created,
+    Installing,
+    Stopped,
+    Running,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Server {
     pub owner: String,
+    pub name: String,
     pub worker: String,
     pub egg: String,
+    pub state: ServerStates,
 }
 
 pub type ServersConfig = HashMap<String, Server>;

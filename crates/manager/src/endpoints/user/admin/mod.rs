@@ -3,7 +3,9 @@ use axum::{
     routing::{get, post},
 };
 
+mod eggs;
 mod groups;
+mod servers;
 mod users;
 mod workers;
 
@@ -29,4 +31,8 @@ pub fn routes() -> Router {
             "/workers/delete",
             post(workers::admin_delete_service_worker),
         )
+        .route("/eggs/get", get(eggs::admin_get_eggs))
+        .route("/eggs/add", post(eggs::admin_add_egg))
+        .route("/servers/get", get(servers::admin_get_servers))
+        .route("/servers/add", post(servers::admin_add_server))
 }

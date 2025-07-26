@@ -12,6 +12,10 @@ The system have 3 components, the web, that is the webpage, the manager, basical
 
 ## Current status
 
-### Panel features
+Everything works except:
 
--   Panel fully works except Servers, Workers, Eggs, Site Settings.
+-   Workers managing
+-   Eggs creating
+-   Eggs importing
+-   Eggs editing
+-   Server settings

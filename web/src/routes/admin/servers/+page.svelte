@@ -10,37 +10,41 @@
 
 	let { data } = $props();
 
-	let ec = $state(data.eggs);
+	let sc = $state(data.servers);
 </script>
 
 <svelte:head>
-	<title>RSGP - Eggs</title>
+	<title>RSGP - Servers</title>
 </svelte:head>
 
 <div class="flex items-center justify-center gap-4">
-	<h1 class="text-3xl font-bold">Eggs:</h1>
+	<h1 class="text-3xl font-bold">Servers:</h1>
 	<Dialog.Root>
 		<Dialog.Trigger>
-			<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Eggs', ['Write'])}>
+			<Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Servers', ['Write'])}>
 				<PlusIcon />
 			</Button>
 		</Dialog.Trigger>
 		<Dialog.Content>
-			<form action="?/addworker" method="POST">
+			<form action="?/addserver" method="POST">
 				<Dialog.Header>
-					<Dialog.Title>Add new worker</Dialog.Title>
-					<Dialog.Description>This will setup a new worker.</Dialog.Description>
+					<Dialog.Title>Add new server</Dialog.Title>
+					<Dialog.Description
+						>This will add a new server and begin its install procedure.</Dialog.Description
+					>
 				</Dialog.Header>
 				<div class="my-4 flex flex-col gap-2">
-					<Label for="name">Worker name</Label>
+					<Label for="name">Name</Label>
 					<Input name="name" id="name" type="text" />
-					<Label for="address">Address (IP or Hostname)</Label>
-					<Input name="address" id="address" type="text" />
-					<Label for="port">Port</Label>
-					<Input name="port" id="port" type="number" />
+					<Label for="owner">Owner</Label>
+					<Input name="owner" id="owner" type="text" />
+					<Label for="worker">Worker</Label>
+					<Input name="worker" id="worker" type="text" />
+					<Label for="egg">Egg</Label>
+					<Input name="egg" id="egg" type="text" />
 				</div>
 				<Dialog.Footer>
-					<Button type="submit">Add user</Button>
+					<Button type="submit">Add server</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
@@ -48,10 +52,10 @@
 </div>
 
 <div class="mx-2 flex flex-wrap gap-2">
-	{#each Object.keys(data.eggs) as egg, i}
+	{#each Object.keys(data.servers) as srv, i}
 		<Card.Root>
 			<Card.Header class="flex items-center justify-center gap-1">
-				<Card.Title>{egg}</Card.Title>
+				<Card.Title>{srv}</Card.Title>
 			</Card.Header>
 			<Card.Content>
 				<h1 class="text-lg font-bold">Servers:</h1>
@@ -61,7 +65,8 @@
 				<div class="flex flex-col gap-2">
 					<Dialog.Root>
 						<Dialog.Trigger
-							><Button disabled={!checkAdvancedPerms(data.layout!.permissions, 'Eggs', ['Write'])}
+							><Button
+								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Workers', ['Write'])}
 								>Change password</Button
 							></Dialog.Trigger
 						>
@@ -72,7 +77,7 @@
 									<Dialog.Description>This will change the user's password.</Dialog.Description>
 								</Dialog.Header>
 								<div class="my-4 flex flex-col gap-2">
-									<input type="text" name="user" hidden bind:value={ec[i]} />
+									<input type="text" name="user" hidden bind:value={sc[i]} />
 									<Label for="password">New password</Label>
 									<Input name="password" type="password" id="password" required />
 								</div>
@@ -87,7 +92,7 @@
 							><Button
 								class="w-full"
 								variant="destructive"
-								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Eggs', ['Write'])}
+								disabled={!checkAdvancedPerms(data.layout!.permissions, 'Servers', ['Write'])}
 								>Delete worker</Button
 							></Dialog.Trigger
 						>
@@ -101,7 +106,7 @@
 							</Dialog.Header>
 							<Dialog.Footer>
 								<form action="?/delete" method="POST">
-									<input type="text" name="worker" id="worker" hidden bind:value={ec[i]} required />
+									<input type="text" name="worker" id="worker" hidden bind:value={sc[i]} required />
 									<Button variant="destructive" type="submit">Delete</Button>
 								</form>
 							</Dialog.Footer>
