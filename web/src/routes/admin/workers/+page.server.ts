@@ -43,6 +43,7 @@ export const actions = {
     addworker: async ({ request, cookies }) => {
         const data = await request.formData();
         const address = data.get("address") as string;
+        const folder = data.get("folder") as string;
         const name = data.get("name") as string;
         const port = data.get("port") as string;
         const https = !!data.get("https");
@@ -55,6 +56,7 @@ export const actions = {
             body: JSON.stringify({
                 address,
                 name,
+                folder,
                 port: Number(port),
                 protocol: https ? "Https" : "Http",
             }),

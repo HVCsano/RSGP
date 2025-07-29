@@ -83,10 +83,12 @@ pub struct AddWorkerBody {
     pub address: String,
     pub port: u16,
     pub protocol: Protocol,
+    pub folder: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct SetupWorkerBody {
+    pub folder: String,
     pub key: String,
 }
 
@@ -130,7 +132,10 @@ pub async fn admin_add_service_worker(
             b.address,
             b.port
         ))
-        .json(&SetupWorkerBody { key })
+        .json(&SetupWorkerBody {
+            key,
+            folder: b.folder,
+        })
         .send()
         .await;
     if workersetup.is_err() {

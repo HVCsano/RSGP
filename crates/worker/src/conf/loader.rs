@@ -18,7 +18,7 @@ pub async fn load_configs() {
         warn!("No main.json found, creating empty main config...");
         let mainconf: Config = Config {
             key: None,
-            servers_folder: "/var/rsgpw/servers".to_string(),
+            servers_folder: "/var/rsgpw".to_string(),
         };
         fs::write(main, serde_json::to_string_pretty(&mainconf).unwrap())
             .await

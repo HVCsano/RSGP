@@ -7,14 +7,9 @@ use crate::conf::{
     structs::Config,
 };
 
-fn default_folder() -> String {
-    "/var/rsgpw/servers".to_string()
-}
-
 #[derive(Debug, Deserialize)]
 pub struct SetupWorkerBody {
     pub key: String,
-    #[serde(default = "default_folder")]
     pub folder: String,
 }
 

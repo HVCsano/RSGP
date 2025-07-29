@@ -32,11 +32,15 @@
 			<form action="?/addworker" method="POST">
 				<Dialog.Header>
 					<Dialog.Title>Add new worker</Dialog.Title>
-					<Dialog.Description>This will setup a new worker.</Dialog.Description>
+					<Dialog.Description
+						>This will setup a new worker. The worker needs to be running.</Dialog.Description
+					>
 				</Dialog.Header>
 				<div class="my-4 flex flex-col gap-2">
 					<Label for="name">Worker name</Label>
 					<Input name="name" id="name" type="text" />
+					<Label for="folder">Servers folder</Label>
+					<Input name="folder" id="folder" type="text" value="/var/rsgpw" />
 					<Label for="address">Address (IP or Hostname)</Label>
 					<Input name="address" id="address" type="text" />
 					<Label for="port">Port</Label>
@@ -47,7 +51,7 @@
 					</div>
 				</div>
 				<Dialog.Footer>
-					<Button type="submit">Add user</Button>
+					<Button type="submit">Add worker</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
