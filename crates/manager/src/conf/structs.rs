@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use rsgp_shared::structs::Egg;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -95,23 +96,4 @@ pub struct Server {
 
 pub type ServersConfig = HashMap<String, Server>;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Egg {
-    pub install: EggInstallConf,
-    pub running: EggRunConf,
-    pub version: String,
-    pub upstream: Option<String>,
-}
-
 pub type EggsConfig = HashMap<String, Egg>;
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct EggInstallConf {
-    pub dependency_installs: Vec<Vec<String>>,
-    pub egg_installs: Vec<Vec<String>>,
-}
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct EggRunConf {
-    pub start_command: String,
-    pub running_text: String,
-}

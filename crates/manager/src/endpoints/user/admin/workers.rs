@@ -7,7 +7,7 @@ use crate::{
         loader::{load_service, write_service},
         structs::{Permissions, PermissionsModifiers, Protocol, UserExt},
     },
-    utils::functions::atleast_one_permission,
+    utils::functions::{atleast_one_permission, get_protocol},
 };
 
 #[debug_handler]
@@ -125,10 +125,7 @@ pub async fn admin_add_service_worker(
     let workersetup = client
         .post(format!(
             "{}://{}:{}/setup",
-            match b.protocol {
-                Protocol::Http => "http",
-                Protocol::Https => "https",
-            },
+            get_protocol(b.protocol),
             b.address,
             b.port
         ))

@@ -1,4 +1,4 @@
-use crate::conf::structs::Permissions;
+use crate::conf::structs::{Permissions, Protocol};
 
 pub fn atleast_one_permission(p: Vec<Permissions>, u: &Vec<Permissions>) -> bool {
     if p.is_empty() || u.is_empty() {
@@ -14,4 +14,11 @@ pub fn atleast_one_permission(p: Vec<Permissions>, u: &Vec<Permissions>) -> bool
         }
     }
     false
+}
+
+pub fn get_protocol(p: Protocol) -> String {
+    match p {
+        Protocol::Http => "http".to_string(),
+        Protocol::Https => "https".to_string(),
+    }
 }

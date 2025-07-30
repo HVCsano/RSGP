@@ -1,13 +1,14 @@
 use axum::{Extension, Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
-use serde::Deserialize;
+use rsgp_shared::structs::Egg;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     conf::{
         loader::{load_eggs, load_servers, load_service, load_users, write_servers},
         structs::{Permissions, PermissionsModifiers, Server, UserExt},
     },
-    utils::functions::atleast_one_permission,
+    utils::functions::{atleast_one_permission, get_protocol},
 };
 
 #[debug_handler]
@@ -36,6 +37,12 @@ pub struct AddServerBody {
     pub owner: String,
     pub worker: String,
     pub egg: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PostAddServerBody {
+    pub name: String,
+    pub egg: Egg,
 }
 
 #[debug_handler]
@@ -68,16 +75,35 @@ pub async fn admin_add_server(
     let key = uuid::Uuid::new_v4().to_string();
     // Add the new worker to the service configuration
     servers.insert(
-        key,
+        key.clone(),
         Server {
             state: crate::conf::structs::ServerStates::Created,
-            egg: b.egg,
+            egg: b.egg.clone(),
             name: b.name,
             owner: b.owner,
-            worker: b.worker,
+            worker: b.worker.clone(),
         },
     );
     write_servers(servers).await;
+    let client = reqwest::Client::new();
+    let work = workers.iter().find(|p| p.name == b.worker).unwrap();
+    let egg = eggs.get(&b.egg).unwrap();
+    let res = client
+        .post(format!(
+            "{}://{}:{}/a/servers/add",
+            get_protocol(work.access.protocol.clone()),
+            work.access.address,
+            work.access.port
+        ))
+        .bearer_auth(work.key.clone())
+        .json(&PostAddServerBody {
+            name: key,
+            egg: egg.clone(),
+        })
+        .send()
+        .await
+        .unwrap();
+    println!("{:?}", res.status());
     // Save the updated service configuration (not implemented here)
     // save_service(updated_workers).await;
 

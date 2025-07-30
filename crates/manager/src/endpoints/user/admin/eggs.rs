@@ -1,11 +1,12 @@
 use axum::{Extension, Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
+use rsgp_shared::structs::Egg;
 use serde::Deserialize;
 
 use crate::{
     conf::{
         loader::{load_eggs, write_eggs},
-        structs::{Egg, Permissions, PermissionsModifiers, UserExt},
+        structs::{Permissions, PermissionsModifiers, UserExt},
     },
     utils::functions::atleast_one_permission,
 };
