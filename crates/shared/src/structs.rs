@@ -29,3 +29,17 @@ pub struct EggRunConf {
     pub start_command: String,
     pub running_text: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ServerStates {
+    Created,
+    Installing,
+    Stopped,
+    Running,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ChangeServerStateBody {
+    pub server: String,
+    pub newstate: ServerStates,
+}

@@ -1,6 +1,6 @@
 use axum::{Extension, Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
-use rsgp_shared::structs::Egg;
+use rsgp_shared::structs::{Egg, ServerStates};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -77,7 +77,7 @@ pub async fn admin_add_server(
     servers.insert(
         key.clone(),
         Server {
-            state: crate::conf::structs::ServerStates::Created,
+            state: ServerStates::Created,
             egg: b.egg.clone(),
             name: b.name,
             owner: b.owner,
@@ -88,7 +88,7 @@ pub async fn admin_add_server(
     let client = reqwest::Client::new();
     let work = workers.iter().find(|p| p.name == b.worker).unwrap();
     let egg = eggs.get(&b.egg).unwrap();
-    let res = client
+    client
         .post(format!(
             "{}://{}:{}/a/servers/add",
             get_protocol(work.access.protocol.clone()),
@@ -103,9 +103,5 @@ pub async fn admin_add_server(
         .send()
         .await
         .unwrap();
-    println!("{:?}", res.status());
-    // Save the updated service configuration (not implemented here)
-    // save_service(updated_workers).await;
-
     Ok(())
 }

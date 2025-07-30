@@ -11,6 +11,7 @@ use crate::conf::{
 pub struct SetupWorkerBody {
     pub key: String,
     pub folder: String,
+    pub url: String,
 }
 
 #[debug_handler]
@@ -27,6 +28,7 @@ pub async fn setup_worker(
     let new_conf = Config {
         key: Some(b.key),
         servers_folder: b.folder,
+        manager_url: Some(b.url),
     };
     write_main_config(new_conf).await;
     Ok(())

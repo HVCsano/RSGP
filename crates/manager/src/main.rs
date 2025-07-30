@@ -2,7 +2,6 @@ use std::error::Error;
 
 use axum::{Router, routing::get};
 use tower::ServiceBuilder;
-use tower_cookies::CookieManagerLayer;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info;
 use tracing_subscriber::FmtSubscriber;
@@ -28,12 +27,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         )
         .route("/auth/login", get(endpoints::auth::login))
         .nest("/user", endpoints::user::routes())
+        .nest("/worker", endpoints::worker::routes())
         .layer(ServiceBuilder::new().layer(CorsLayer::permissive()))
-        .layer(TraceLayer::new_for_http())
-        .layer(CookieManagerLayer::new());
+        .layer(TraceLayer::new_for_http());
     info!("[API] Starting server on :3000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
     axum::serve(listener, app.into_make_service()).await?;
-
     Ok(())
 }

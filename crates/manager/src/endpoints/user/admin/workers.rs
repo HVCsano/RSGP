@@ -90,6 +90,7 @@ pub struct AddWorkerBody {
 pub struct SetupWorkerBody {
     pub folder: String,
     pub key: String,
+    pub url: String,
 }
 
 #[debug_handler]
@@ -132,6 +133,7 @@ pub async fn admin_add_service_worker(
         .json(&SetupWorkerBody {
             key,
             folder: b.folder,
+            url: service.public_url.clone(),
         })
         .send()
         .await;

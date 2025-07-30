@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use rsgp_shared::structs::Egg;
+use rsgp_shared::structs::{Egg, ServerStates};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -42,11 +42,12 @@ pub type UsersConfig = HashMap<String, User>;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServiceConfig {
     pub name: String,
+    pub public_url: String,
     pub jwt_key: String,
     pub workers: Vec<Workers>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Workers {
     pub name: String,
     pub access: WorkerAccess,
@@ -58,7 +59,7 @@ pub enum Protocol {
     Http,
     Https,
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct WorkerAccess {
     pub address: String,
     pub port: String,
@@ -76,14 +77,6 @@ pub struct Session {
 }
 
 pub type GroupsConfig = HashMap<String, Vec<Permissions>>;
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum ServerStates {
-    Created,
-    Installing,
-    Stopped,
-    Running,
-}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Server {

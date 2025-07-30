@@ -36,7 +36,6 @@ export const actions = {
                 worker,
             }),
         });
-
         throw redirect(302, new URL(request.url).pathname);
     },
 };

@@ -56,6 +56,7 @@ pub async fn load_configs() {
         let rstr = general_purpose::URL_SAFE_NO_PAD.encode(&random_bytes);
         let serviceconf = ServiceConfig {
             name: "Rust Game Panel".to_string(),
+            public_url: "http://localhost:3000".to_string(),
             jwt_key: rstr,
             workers: Vec::new(),
         };

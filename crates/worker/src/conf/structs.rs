@@ -4,4 +4,5 @@ use serde::{Deserialize, Serialize};
 pub struct Config {
     pub key: Option<String>,
     pub servers_folder: String,
+    pub manager_url: Option<String>,
 }
