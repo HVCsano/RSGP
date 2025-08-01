@@ -4,12 +4,12 @@ use rsgp_shared::structs::ChangeServerStateBody;
 
 use crate::conf::{
     loader::{load_servers, write_servers},
-    structs::{Server, Workers},
+    structs::{Server, WorkersExt},
 };
 
 #[debug_handler]
 pub async fn worker_change_state(
-    w: Extension<Workers>,
+    w: Extension<WorkersExt>,
     Json(b): Json<ChangeServerStateBody>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let mut servers = load_servers().await;

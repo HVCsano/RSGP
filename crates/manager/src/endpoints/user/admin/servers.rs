@@ -60,15 +60,15 @@ pub async fn admin_add_server(
         ));
     }
     let eggs = load_eggs().await;
-    if eggs.iter().find(|(k, _)| k == &&b.egg).is_none() {
+    if eggs.get(&b.egg).is_none() {
         return Err((StatusCode::BAD_REQUEST, "No egg found.".to_string()));
     }
     let users = load_users().await;
-    if users.iter().find(|(k, _)| k == &&b.owner).is_none() {
+    if users.get(&b.owner).is_none() {
         return Err((StatusCode::BAD_REQUEST, "No owner found.".to_string()));
     }
     let workers = load_service().await.workers;
-    if workers.iter().find(|w| w.name == b.worker).is_none() {
+    if workers.get(&b.worker).is_none() {
         return Err((StatusCode::BAD_REQUEST, "No worker found.".to_string()));
     }
     let mut servers = load_servers().await;
@@ -86,7 +86,7 @@ pub async fn admin_add_server(
     );
     write_servers(servers).await;
     let client = reqwest::Client::new();
-    let work = workers.iter().find(|p| p.name == b.worker).unwrap();
+    let work = workers.get(&b.worker).unwrap();
     let egg = eggs.get(&b.egg).unwrap();
     client
         .post(format!(

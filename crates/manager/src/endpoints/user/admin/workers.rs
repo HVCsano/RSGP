@@ -53,7 +53,7 @@ pub async fn admin_check_service_worker(
         ));
     }
     let workers = load_service().await.workers;
-    let our_worker = workers.iter().find(|p| p.name == b.name);
+    let our_worker = workers.get(&b.name);
     if our_worker.is_none() {
         return Err((
             StatusCode::NOT_FOUND,
@@ -111,7 +111,6 @@ pub async fn admin_add_service_worker(
     let service = load_service().await;
     let key = uuid::Uuid::new_v4().to_string();
     let new_worker = crate::conf::structs::Workers {
-        name: b.name,
         access: crate::conf::structs::WorkerAccess {
             address: b.address.clone(),
             port: b.port.to_string(),
@@ -121,7 +120,7 @@ pub async fn admin_add_service_worker(
     };
     // Add the new worker to the service configuration
     let mut updated_workers = service.workers;
-    updated_workers.push(new_worker);
+    updated_workers.insert(b.name.clone(), new_worker);
     let client = reqwest::Client::new();
     let workersetup = client
         .post(format!(
@@ -181,7 +180,7 @@ pub async fn admin_delete_service_worker(
     }
 
     let mut service = load_service().await;
-    service.workers.retain(|worker| worker.name != b.worker);
+    service.workers.retain(|w, _| w != &b.worker);
     write_service(service).await;
     Ok(())
 }

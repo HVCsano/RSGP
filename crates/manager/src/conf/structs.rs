@@ -44,11 +44,16 @@ pub struct ServiceConfig {
     pub name: String,
     pub public_url: String,
     pub jwt_key: String,
-    pub workers: Vec<Workers>,
+    pub workers: HashMap<String, Workers>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Workers {
+    pub access: WorkerAccess,
+    pub key: String,
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct WorkersExt {
     pub name: String,
     pub access: WorkerAccess,
     pub key: String,

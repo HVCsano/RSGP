@@ -1,9 +1,11 @@
-use std::error::Error;
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use axum::{
     Router,
     routing::{get, post},
 };
+use lazy_static::lazy_static;
+use tokio::{sync::Mutex, task::JoinHandle};
 use tower::ServiceBuilder;
 use tower_cookies::CookieManagerLayer;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
@@ -11,6 +13,11 @@ use tracing::info;
 use tracing_subscriber::FmtSubscriber;
 
 use crate::endpoints::setup::setup_worker;
+
+lazy_static! {
+    static ref SERVERS: Arc<Mutex<HashMap<String, JoinHandle<()>>>> =
+        Arc::new(Mutex::const_new(HashMap::new()));
+}
 
 mod conf;
 mod endpoints;

@@ -58,7 +58,7 @@ pub async fn load_configs() {
             name: "Rust Game Panel".to_string(),
             public_url: "http://localhost:3000".to_string(),
             jwt_key: rstr,
-            workers: Vec::new(),
+            workers: HashMap::new(),
         };
         fs::write(service, serde_json::to_string_pretty(&serviceconf).unwrap())
             .await

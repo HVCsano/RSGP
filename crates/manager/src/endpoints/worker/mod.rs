@@ -8,7 +8,7 @@ use axum::{
 };
 use reqwest::StatusCode;
 
-use crate::conf::loader::load_service;
+use crate::conf::{loader::load_service, structs::WorkersExt};
 
 mod servers;
 
@@ -34,10 +34,14 @@ pub async fn worker_auth(
     }
     let key = auth.split("Bearer ").collect::<Vec<&str>>()[1];
     let service = load_service().await;
-    let worker = service.workers.iter().find(|p| p.key == key.to_string());
+    let worker = service.workers.get(key);
     if worker.is_none() {
         return Err((StatusCode::UNAUTHORIZED, "No worker found".to_string()));
     }
-    r.extensions_mut().insert(worker.unwrap().clone());
+    r.extensions_mut().insert(WorkersExt {
+        access: worker.unwrap().access.clone(),
+        key: worker.unwrap().key.clone(),
+        name: key.to_string(),
+    });
     Ok(n.run(r).await)
 }

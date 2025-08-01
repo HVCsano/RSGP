@@ -2,7 +2,10 @@ use axum::{Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
 use rsgp_shared::structs::{ChangeServerStateBody, Egg, ServerStates};
 use serde::Deserialize;
-use tokio::process;
+use tokio::{
+    fs::OpenOptions,
+    process::{self, Command},
+};
 
 use crate::conf::loader::get_main_config;
 
@@ -66,6 +69,38 @@ pub async fn a_add_server(
             }
         }
         change_server_state(b.name, ServerStates::Stopped).await;
+    });
+    Ok(())
+}
+
+#[debug_handler]
+pub async fn a_run_server(
+    Json(b): Json<AddServerBody>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    change_server_state(b.name.clone(), ServerStates::Running).await;
+    let conf = get_main_config().await;
+    tokio::spawn(async move {
+        let mut log = OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open("./logs/server.log")
+            .await
+            .unwrap();
+        let mut srv = Command::new("sh")
+            .arg("-c")
+            .current_dir(format!("{}/{}", conf.servers_folder, b.name))
+            .arg(b.egg.running.start_command)
+            .stdout(std::process::Stdio::piped())
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap();
+        let mut stdout = srv.stdout.take().unwrap();
+        tokio::spawn(async move {
+            tokio::io::copy(&mut stdout, &mut log).await.ok();
+        });
+
+        let _ = srv.wait().await;
     });
     Ok(())
 }

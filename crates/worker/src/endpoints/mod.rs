@@ -46,5 +46,6 @@ pub fn routes() -> Router {
     Router::new()
         .route("/", get(check::a_check))
         .route("/servers/add", post(servers::a_add_server))
+        .route("/servers/run", post(servers::a_run_server))
         .layer(from_fn(auth_middle))
 }
