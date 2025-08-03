@@ -77,16 +77,16 @@
 {/if}
 
 <div class="mx-2 flex flex-wrap gap-2">
-	{#each data.workers as worker, i}
+	{#each Object.keys(data.workers) as i}
 		<Card.Root>
 			<Card.Header class="flex items-center justify-center gap-1">
-				{#if worker.status}
+				{#if data.workers[i].status}
 					<CheckCircle2Icon class="text-green-500" />
 				{:else}
 					<AlertCircleIcon class="text-red-600" />
 				{/if}
-				<Card.Title class={`${worker.status ? 'text-green-500' : 'text-red-600'}`}
-					>{worker.name}</Card.Title
+				<Card.Title class={`${data.workers[i].status ? 'text-green-500' : 'text-red-600'}`}
+					>{i}</Card.Title
 				>
 			</Card.Header>
 			<Card.Content>
@@ -109,7 +109,7 @@
 									<Dialog.Description>This will change the user's password.</Dialog.Description>
 								</Dialog.Header>
 								<div class="my-4 flex flex-col gap-2">
-									<input type="text" name="user" hidden bind:value={wc[i].name} />
+									<input type="text" name="user" hidden bind:value={wc[i]} />
 									<Label for="password">New password</Label>
 									<Input name="password" type="password" id="password" required />
 									<div class="flex w-full items-center justify-between">
@@ -142,14 +142,7 @@
 							</Dialog.Header>
 							<Dialog.Footer>
 								<form action="?/delete" method="POST">
-									<input
-										type="text"
-										name="worker"
-										id="worker"
-										hidden
-										bind:value={wc[i].name}
-										required
-									/>
+									<input type="text" name="worker" id="worker" hidden bind:value={wc[i]} required />
 									<Button variant="destructive" type="submit">Delete</Button>
 								</form>
 							</Dialog.Footer>

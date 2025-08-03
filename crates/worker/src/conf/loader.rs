@@ -13,6 +13,10 @@ pub async fn load_configs() {
     if !path.exists() {
         fs::create_dir(path).await.unwrap();
     }
+    let logs = Path::new("./logs");
+    if !logs.exists() {
+        fs::create_dir(logs).await.unwrap();
+    }
     let main = Path::new("./config/main.json");
     if !main.exists() {
         warn!("No main.json found, creating empty main config...");

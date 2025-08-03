@@ -9,7 +9,7 @@ use tracing::warn;
 use crate::{
     conf::{
         loader::{add_session, get_groups_perm, get_session, load_service, load_users},
-        structs::{Permissions, UserExt},
+        structs::{Permissions, UserExt, Warning},
     },
     jwt::structs::JWT,
     utils::{functions::atleast_one_permission, hash::hash_str},
@@ -56,11 +56,21 @@ pub async fn auth_middle(
     if !atleast_one_permission(vec![Permissions::Login], &perms) {
         return Err((StatusCode::NOT_ACCEPTABLE, "User is disabled".to_string()));
     }
+    let mut warnings = Vec::new();
+    if perms.contains(&Permissions::Admin)
+        && service.public_url == "http://localhost:3000".to_string()
+    {
+        warnings.push(Warning {
+            title: "Change public url".to_string(),
+            description: "By default, the public url, which is being given to the workers for communication is set to http://localhost:3000. To remove this warning, change it to atleast http://127.0.0.1:3000 in the site settings page.".to_string()
+        })
+    }
     r.extensions_mut().insert(UserExt {
         username: user.0.clone(),
         password: user.1.password.clone(),
         groups: user.1.groups.clone(),
         permissions: perms,
+        warnings: warnings,
     });
     Ok(n.run(r).await)
 }

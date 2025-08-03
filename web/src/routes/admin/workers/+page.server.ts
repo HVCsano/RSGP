@@ -7,12 +7,13 @@ export const load = (async ({ cookies }) => {
         headers: { "Authorization": `Bearer ${cookies.get("session")}` },
     });
     const workers: {
-        name: string;
-        access: { address: string; port: string };
-        key: string;
-        status: boolean;
-    }[] = await getworkers.json();
-    for (let i = 0; i < workers.length; i++) {
+        [key: string]: {
+            access: { address: string; port: string };
+            key: string;
+            status: boolean;
+        };
+    } = await getworkers.json();
+    for (let i = 0; i < Object.keys(workers).length; i++) {
         const w = workers[i];
         const check = await fetch(`${apiUrl}/user/admin/workers/check`, {
             method: "POST",
@@ -21,17 +22,17 @@ export const load = (async ({ cookies }) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                name: w.name,
+                name: Object.keys(workers)[i],
             }),
         });
         if (!check.ok) {
-            workers[i] = {
+            workers[Object.keys(workers)[i]] = {
                 ...w,
                 status: false,
             };
             continue;
         }
-        workers[i] = {
+        workers[Object.keys(workers)[i]] = {
             ...w,
             status: true,
         };

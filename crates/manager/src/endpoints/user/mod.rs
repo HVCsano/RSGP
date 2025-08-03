@@ -16,6 +16,7 @@ pub fn routes() -> Router {
         .route("/servers/get", get(servers::get_own_servers))
         .route("/server/get", post(servers::get_server_info))
         .route("/server/run", post(servers::start_server))
+        .route("/server/log", post(servers::get_server_log))
         .route("/sessions/changename", post(session::user_post_change_name))
         .route("/sessions/get", get(session::user_get_sessions))
         .route("/sessions/remove", post(session::user_post_remove_session))

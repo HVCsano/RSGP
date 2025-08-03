@@ -1,13 +1,16 @@
+use std::{fs, path::Path};
+
 use axum::{Json, debug_handler, response::IntoResponse};
 use reqwest::StatusCode;
 use rsgp_shared::structs::{ChangeServerStateBody, Egg, ServerStates};
 use serde::Deserialize;
 use tokio::{
-    fs::OpenOptions,
+    fs::{File, OpenOptions},
+    io::AsyncReadExt,
     process::{self, Command},
 };
 
-use crate::conf::loader::get_main_config;
+use crate::{SERVERS, conf::loader::get_main_config};
 
 pub async fn change_server_state(server: String, state: ServerStates) {
     let conf = get_main_config().await;
@@ -79,28 +82,64 @@ pub async fn a_run_server(
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     change_server_state(b.name.clone(), ServerStates::Running).await;
     let conf = get_main_config().await;
-    tokio::spawn(async move {
-        let mut log = OpenOptions::new()
-            .create(true)
-            .truncate(true)
-            .write(true)
-            .open("./logs/server.log")
-            .await
-            .unwrap();
-        let mut srv = Command::new("sh")
-            .arg("-c")
-            .current_dir(format!("{}/{}", conf.servers_folder, b.name))
-            .arg(b.egg.running.start_command)
-            .stdout(std::process::Stdio::piped())
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-            .unwrap();
-        let mut stdout = srv.stdout.take().unwrap();
+    let mut srv = SERVERS.lock().await;
+    let our_srv = srv.get(&b.name);
+    if our_srv.is_some() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Server is already running.".to_string(),
+        ));
+    }
+    srv.insert(
+        b.name.clone(),
         tokio::spawn(async move {
-            tokio::io::copy(&mut stdout, &mut log).await.ok();
-        });
+            let log_path = format!("./logs/{}", &b.name);
+            let p = Path::new(&log_path);
+            if !p.exists() {
+                fs::create_dir(p).unwrap();
+            }
+            let mut log = OpenOptions::new()
+                .create(true)
+                .truncate(true)
+                .write(true)
+                .open(format!("{}/server.log", &log_path))
+                .await
+                .unwrap();
+            let mut srv = Command::new("sh")
+                .arg("-c")
+                .current_dir(format!("{}/{}", conf.servers_folder, &b.name))
+                .arg(b.egg.running.start_command)
+                .stdout(std::process::Stdio::piped())
+                .stdin(std::process::Stdio::piped())
+                .spawn()
+                .unwrap();
+            let mut stdout = srv.stdout.take().unwrap();
+            tokio::spawn(async move {
+                tokio::io::copy(&mut stdout, &mut log).await.ok();
+            });
 
-        let _ = srv.wait().await;
-    });
+            let _ = srv.wait().await;
+        }),
+    );
     Ok(())
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GetServerLogBody {
+    pub name: String,
+}
+
+#[debug_handler]
+pub async fn a_get_server_log(
+    Json(b): Json<GetServerLogBody>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    let p = format!("./logs/{}/server.log", b.name);
+    let path = Path::new(&p);
+    if !path.exists() {
+        return Err((StatusCode::NOT_FOUND, "Log not found".to_string()));
+    }
+    let mut file = File::open(&path).await.unwrap();
+    let mut dst = String::new();
+    file.read_to_string(&mut dst).await.unwrap();
+    Ok(dst.into_response())
 }

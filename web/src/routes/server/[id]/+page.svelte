@@ -17,3 +17,10 @@
 		>Stop server</Button
 	>
 </form>
+
+<div class="mx-auto w-[60dvw] text-center">
+	<h2>Log</h2>
+	<pre class="text-left">
+		{data.log}
+	</pre>
+</div>

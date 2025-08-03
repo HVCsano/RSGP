@@ -35,6 +35,13 @@ pub struct UserExt {
     pub password: String,
     pub groups: Vec<String>,
     pub permissions: Vec<Permissions>,
+    pub warnings: Vec<Warning>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Warning {
+    pub title: String,
+    pub description: String,
 }
 
 pub type UsersConfig = HashMap<String, User>;

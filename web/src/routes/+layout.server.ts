@@ -15,6 +15,7 @@ export const load = (async ({ cookies, url }) => {
             const json: {
                 username: string;
                 permissions: Permissions[];
+                warnings: { title: string; description: string }[];
             } = await checkLogin.json();
             return {
                 layout: json,

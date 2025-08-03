@@ -99,3 +99,40 @@ pub async fn start_server(
         .unwrap();
     Ok(())
 }
+
+#[derive(Debug, Serialize)]
+pub struct GetServerLogBody {
+    name: String,
+}
+
+#[debug_handler]
+pub async fn get_server_log(
+    e: Extension<UserExt>,
+    Json(b): Json<GetServerInfoBody>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    let servers = load_servers().await;
+    let server = servers.get(&b.id);
+    if server.is_none() {
+        return Err((StatusCode::NOT_FOUND, "Server not found".to_string()));
+    }
+    let server = server.unwrap();
+    if server.owner != e.username {
+        return Err((StatusCode::NOT_FOUND, "Server not found".to_string()));
+    }
+    let workers = load_service().await.workers;
+    let work = workers.get(&server.worker).unwrap();
+    let client = reqwest::Client::new();
+    let req = client
+        .post(format!(
+            "{}://{}:{}/a/servers/log",
+            get_protocol(work.access.protocol.clone()),
+            work.access.address,
+            work.access.port
+        ))
+        .bearer_auth(work.key.clone())
+        .json(&GetServerLogBody { name: b.id })
+        .send()
+        .await
+        .unwrap();
+    Ok(req.text().await.unwrap())
+}

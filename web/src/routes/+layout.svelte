@@ -8,6 +8,10 @@
 
 	import { ModeWatcher } from 'mode-watcher';
 
+	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
+
+	import * as Alert from '$lib/components/ui/alert/index.js';
+
 	let { children, data } = $props();
 </script>
 
@@ -22,6 +26,18 @@
 </svelte:head>
 
 <ModeWatcher />
+
+{#if data.layout?.warnings}
+	{#each data.layout.warnings as warn}
+		<div class="animate-in fade-in mx-auto mt-4 w-[400px] duration-100">
+			<Alert.Root variant="destructive">
+				<AlertCircleIcon />
+				<Alert.Title>{warn.title}</Alert.Title>
+				<Alert.Description>{warn.description}</Alert.Description>
+			</Alert.Root>
+		</div>
+	{/each}
+{/if}
 
 {#if page.url.pathname !== '/login'}
 	<header>

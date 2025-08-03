@@ -19,5 +19,15 @@ export const load = (async ({ cookies, params }) => {
         egg: Egg;
         state: ServerStates;
     } = await f.json();
-    return { info };
+    const log = await fetch(`${apiUrl}/user/server/log`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${cookies.get("session")}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            id: params.id,
+        }),
+    });
+    return { info, log: await log.text() };
 }) satisfies LayoutServerLoad;
