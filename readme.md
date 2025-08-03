@@ -9,13 +9,3 @@ Sometimes people need a simpler solution than Pterodactyl, thats when this pops 
 ## Design
 
 The system have 3 components, the web, that is the webpage, the manager, basically the api for the web, the directon, and the worker, which is the runner itself.
-
-## Current status
-
-Everything works except:
-
--   Workers managing
--   Eggs creating
--   Eggs importing
--   Eggs editing
--   Server settings
