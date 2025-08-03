@@ -1,0 +1,68 @@
+name: Release Crates
+
+on:
+    push:
+        tags:
+            - 'v*'
+
+jobs:
+    build-linux:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Rust
+              uses: actions/setup-rust@v1
+              with:
+                  rust-version: stable
+
+            - name: Build crates
+              run: cargo build --release
+            - name: Create Release
+              id: create_release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ github.ref_name }}
+                  name: Release ${{ github.ref_name }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload worker binary
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      target/release/rsgp-manager
+                      target/release/rsgp-worker
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    build-windows:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Rust
+              uses: actions/setup-rust@v1
+              with:
+                  rust-version: stable
+
+            - name: Build crates
+              run: cargo build --release
+            - name: Create Release
+              id: create_release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ github.ref_name }}
+                  name: Release ${{ github.ref_name }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload worker binary
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      target/release/rsgp-manager.exe
+                      target/release/rsgp-worker.exe
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
