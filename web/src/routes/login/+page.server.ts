@@ -24,7 +24,6 @@ export const actions = {
                 cookies.set("session", session, {
                     path: "/",
                     httpOnly: true,
-                    secure: true,
                     sameSite: "lax",
                 });
                 return {
