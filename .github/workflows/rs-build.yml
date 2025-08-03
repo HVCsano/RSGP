@@ -62,3 +62,29 @@ jobs:
                       target/release/rsgp-worker.exe
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    build-linux-arm:
+        runs-on: ubuntu-latest
+        needs: build-linux
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install cross
+              run: cargo install cross
+
+            - name: Build for ARM64
+              run: cross build --release --target aarch64-unknown-linux-gnu
+
+            - name: Rename ARM binaries
+              run: |
+                  mv target/aarch64-unknown-linux-gnu/release/rsgp-manager target/aarch64-unknown-linux-gnu/release/rsgp-manager-arm
+                  mv target/aarch64-unknown-linux-gnu/release/rsgp-worker target/aarch64-unknown-linux-gnu/release/rsgp-worker-arm
+
+            - name: Upload ARM binaries
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      target/aarch64-unknown-linux-gnu/release/rsgp-manager-arm
+                      target/aarch64-unknown-linux-gnu/release/rsgp-worker-arm
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
