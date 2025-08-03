@@ -97,17 +97,15 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
+            - uses: denoland/setup-deno@v2
               with:
-                  node-version: 20
-
+                  deno-version: vx.x.x
             - name: Install dependencies
-              run: npm i
+              run: deno install
               working-directory: ./web
 
             - name: Build web
-              run: npm run build
+              run: deno task build
               working-directory: ./web
 
             - name: Archive web build
