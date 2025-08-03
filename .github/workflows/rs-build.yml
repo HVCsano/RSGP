@@ -16,18 +16,11 @@ jobs:
               uses: actions-rust-lang/setup-rust-toolchain@v1
             - name: Build crates
               run: cargo build --release
-            - name: Create Release
-              id: create_release
+            - name: Upload worker binary
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ github.ref_name }}
                   name: Release ${{ github.ref_name }}
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Upload worker binary
-              uses: softprops/action-gh-release@v2
-              with:
                   draft: true
                   files: |
                       target/release/rsgp-manager
@@ -44,18 +37,11 @@ jobs:
 
             - name: Build crates
               run: cargo build --release
-            - name: Create Release
-              id: create_release
+            - name: Upload worker binary
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ github.ref_name }}
                   name: Release ${{ github.ref_name }}
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Upload worker binary
-              uses: softprops/action-gh-release@v2
-              with:
                   draft: true
                   files: |
                       target/release/rsgp-manager.exe
@@ -86,6 +72,8 @@ jobs:
             - name: Upload web.zip to release
               uses: softprops/action-gh-release@v2
               with:
+                  tag_name: ${{ github.ref_name }}
+                  name: Release ${{ github.ref_name }}
                   draft: true
                   files: ./web/web.zip
               env:
