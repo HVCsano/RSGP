@@ -71,6 +71,9 @@ jobs:
             - name: Install cross
               run: cargo install cross
 
+            - name: Install ARM OpenSSL dev libraries
+              run: sudo apt-get update && sudo apt-get install -y libssl-dev:arm64 pkg-config
+
             - name: Build for ARM64
               run: cross build --release --target aarch64-unknown-linux-gnu
 
@@ -82,8 +85,39 @@ jobs:
             - name: Upload ARM binaries
               uses: softprops/action-gh-release@v2
               with:
+                  draft: true
                   files: |
                       target/aarch64-unknown-linux-gnu/release/rsgp-manager-arm
                       target/aarch64-unknown-linux-gnu/release/rsgp-worker-arm
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    build-web:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - name: Install dependencies
+              run: npm i
+              working-directory: ./web
+
+            - name: Build web
+              run: npm run build
+              working-directory: ./web
+
+            - name: Archive web build
+              run: zip -r web.zip build/
+              working-directory: ./web
+
+            - name: Upload web.zip to release
+              uses: softprops/action-gh-release@v2
+              with:
+                  draft: true
+                  files: ./web/web.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
