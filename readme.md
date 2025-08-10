@@ -13,3 +13,6 @@ The system have 3 components, the web, that is the webpage, the manager, basical
 ## Wiki
 
 The wiki will be used for documentation, and for example eggs.
+
+## Summer of Making
+The demo page username and password is demo.
